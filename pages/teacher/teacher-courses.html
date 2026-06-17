@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Console - Kelola Mata Kuliah</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+
+<body data-theme="teacher">
+
+    <div class="d-flex" id="wrapper">
+        <div id="sidebar-container"></div>
+
+        <div id="page-content-wrapper" class="w-100 flex-grow-1 d-flex flex-column">
+            <div id="navbar-container"></div>
+
+            <div class="container-fluid px-4 py-4">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="fw-bold mb-1" id="workspace-title">Kelola Mata Kuliah</h2>
+                        <p class="mb-0" style="color: var(--text-secondary);">Penyusunan silabus, distribusi materi, dan
+                            manajemen penugasan berkas.</p>
+                    </div>
+                    <button class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal"
+                        data-bs-target="#addCourseModal">
+                        <i class="ph-bold ph-plus"></i> Tambah Kelas Baru
+                    </button>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <div class="card p-3 h-100 border-0" style="background-color: var(--color-surface);">
+                            <div class="small fw-bold mb-3"
+                                style="color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">
+                                Daftar Kelas Aktif</div>
+                            <div class="list-group list-group-flush gap-2" id="teacher-course-list">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="card p-4 border-0" style="background-color: var(--color-surface);">
+                            <div
+                                class="d-flex justify-content-between align-items-center mb-4 border-bottom border-hairline pb-3">
+                                <div>
+                                    <h4 class="fw-bold mb-0 text-white" id="active-managed-course">Pilih kelas di
+                                        sebelah kiri</h4>
+                                    <small style="color: var(--color-primary);" id="active-managed-lecturer"></small>
+                                </div>
+                                <button class="btn btn-outline-light btn-sm fw-semibold" id="btn-add-week"
+                                    style="border-color: var(--border-hairline);" disabled>+ Tambah Minggu Sesi</button>
+                            </div>
+
+                            <div class="accordion syllabus-accordion" id="teacherSyllabusBuilder">
+                                <div class="text-center py-5 text-muted" id="syllabus-empty-state">
+                                    <i class="ph ph-layout display-4 mb-2"></i>
+                                    <p class="small">Silakan pilih salah satu kelas aktif untuk mulai menyusun materi
+                                        dan tugas kelompok.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addCourseModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0"
+                style="background-color: var(--color-surface); border-radius: var(--radius-card); border: 1px solid var(--border-hairline) !important;">
+                <div class="modal-body p-4 text-white">
+                    <h5 class="fw-bold mb-3">Buat Kelas Baru</h5>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Nama Mata Kuliah / Pelajaran</label>
+                        <input type="text" class="form-control bg-transparent text-white"
+                            style="border-color: var(--border-hairline);" placeholder="Contoh: Pemrograman Java Lanjut">
+                    </div>
+                    <div class="d-flex gap-2 justify-content-end mt-4">
+                        <button type="button" class="btn btn-sm btn-outline-light" data-bs-dismiss="modal"
+                            style="border-color: var(--border-hairline);">Batal</button>
+                        <button type="button" class="btn btn-sm btn-primary" data-bs-dismiss="modal">Simpan
+                            Kelas</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createGroupTaskModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0"
+                style="background-color: var(--color-surface); border-radius: var(--radius-card); border: 1px solid var(--border-hairline) !important;">
+
+                <div class="modal-header border-bottom border-hairline px-4 py-3">
+                    <h5 class="fw-bold modal-title text-white d-flex align-items-center gap-2">
+                        <i class="ph-bold ph-users-three text-warning"></i> Konfigurasi Proyek Kelompok Baru
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body p-4 text-white overflow-auto" style="max-height: 75vh;">
+                    <form id="groupTaskForm">
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-7">
+                                <label class="form-label small text-secondary fw-semibold">NAMA TUGAS / PROYEK</label>
+                                <input type="text" class="form-control bg-transparent text-white border-hairline"
+                                    id="taskNameInput" placeholder="Contoh: Proyek Arsitektur React & API" required>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label small text-secondary fw-semibold">TENGGAT PENGUMPULAN</label>
+                                <input type="datetime-local"
+                                    class="form-control bg-transparent text-white border-hairline"
+                                    id="taskDeadlineInput" required>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4 p-3 rounded"
+                            style="background-color: var(--bg-canvas); border: 1px solid var(--border-hairline);">
+                            <div class="col-md-6">
+                                <label class="form-label small text-secondary fw-semibold">METODE PENDAFTARAN
+                                    KELOMPOK</label>
+                                <select class="form-select bg-transparent text-white border-hairline"
+                                    id="groupAllocationMode" style="cursor: pointer;">
+                                    <option value="manual" style="background-color: var(--bg-canvas);">Dibuat oleh
+                                        Pengajar (Manual/Acak)</option>
+                                    <option value="self" style="background-color: var(--bg-canvas);">Pilihan Mandiri
+                                        oleh Siswa/Mahasiswa</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-secondary fw-semibold">BATASAN MAKSIMAL ANGGOTA PER
+                                    KELOMPOK</label>
+                                <div class="input-group">
+                                    <input type="number"
+                                        class="form-control bg-transparent text-white border-hairline text-center"
+                                        id="maxMembersInput" value="5" min="2" max="10">
+                                    <span class="input-group-text bg-transparent text-secondary border-hairline">Orang /
+                                        Kelompok</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="manual-group-assignment-panel" class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="fw-bold mb-0 text-white small"><i class="ph ph-grid-four me-1"></i> MATRIKS
+                                    ALOKASI ANGGOTA KELOMPOK</h6>
+                                <button type="button" class="btn btn-sm btn-outline-light" id="btn-add-group-bucket"
+                                    style="border-color: var(--border-hairline); font-size: 12px;">+ Tambah Wadah
+                                    Kelompok</button>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="p-3 rounded h-100"
+                                        style="background-color: rgba(255,255,255,0.02); border: 1px solid var(--border-hairline);">
+                                        <div class="small fw-bold text-warning mb-2"
+                                            style="font-size: 11px; letter-spacing: 0.5px;">Siswa Belum Dialokasikan
+                                        </div>
+                                        <div class="d-flex flex-column gap-2" id="unassigned-students-pool"
+                                            style="max-height: 250px; overflow-y: auto;">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-8">
+                                    <div class="row g-2" id="groups-buckets-container"
+                                        style="max-height: 250px; overflow-y: auto;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="self-group-info-panel" class="p-3 rounded border border-dashed d-none text-center mb-2"
+                            style="border-color: var(--border-hairline);">
+                            <i class="ph ph-info display-6 text-info mb-2"></i>
+                            <p class="small mb-0 text-secondary">Siswa akan diberikan kebebasan memilih nomor kelompok
+                                mereka sendiri saat mengunggah tugas pada dashboard siswa, sistem otomatis mengunci
+                                pilihan jika kuota maksimal kelompok terpenuhi.</p>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div class="modal-footer border-top border-hairline px-4 py-3">
+                    <button type="button" class="btn btn-sm btn-outline-light" data-bs-dismiss="modal"
+                        style="border-color: var(--border-hairline);">Batal</button>
+                    <button type="button" class="btn btn-sm btn-primary px-4" id="btn-save-group-task">Terbitkan Tugas
+                        Kelompok</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../assets/js/components.js"></script>
+    <script src="../../assets/js/data.js"></script>
+    <script src="../../assets/js/app.js"></script>
+</body>
+
+</html>

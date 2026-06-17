@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sesi Presensi Berjalan - LMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+
+    <style>
+        /* Animasi Progress Bar OTP 10 Detik */
+        @keyframes shrinkTimer {
+            from {
+                width: 100%;
+            }
+
+            to {
+                width: 0%;
+            }
+        }
+
+        .timer-bar {
+            height: 8px;
+            background-color: var(--color-primary);
+            animation: shrinkTimer 10s linear infinite;
+        }
+
+        /* Efek kedip saat PIN berubah */
+        @keyframes flashUpdate {
+            0% {
+                color: var(--color-primary);
+                transform: scale(1.05);
+            }
+
+            100% {
+                color: var(--text-primary);
+                transform: scale(1);
+            }
+        }
+
+        .pin-update-anim {
+            animation: flashUpdate 0.5s ease-out;
+        }
+    </style>
+</head>
+
+<body data-theme="teacher" class="vh-100 overflow-hidden d-flex flex-column"
+    style="background-color: var(--bg-canvas);">
+
+    <!-- Header / Navigasi Darurat -->
+    <div class="px-5 py-4 d-flex justify-content-between align-items-center border-bottom border-hairline"
+        style="background-color: var(--color-surface);">
+        <div>
+            <div class="badge-lime mb-2 d-inline-block" style="font-size: 14px;"><i
+                    class="ph-bold ph-broadcast me-1"></i> SESI PRESENSI AKTIF</div>
+            <h2 class="fw-bold mb-0 text-white" style="font-family: 'Rubik', sans-serif;">Front-end React & Tailwind
+            </h2>
+        </div>
+        <a href="teacher-dashboard.html" class="btn btn-outline-light fw-bold px-4 py-2"
+            style="border-color: var(--border-hairline);">
+            Tutup Sesi
+        </a>
+    </div>
+
+    <!-- Area Utama Layar Proyektor -->
+    <div class="row g-0 flex-grow-1" style="min-height: 0;">
+
+        <div class="col-8 d-flex flex-column justify-content-center align-items-center position-relative h-100">
+            <div class="position-absolute top-0 w-100" style="background-color: var(--border-hairline);">
+                <div id="otpProgressBar" class="timer-bar"></div>
+            </div>
+
+            <div class="text-center mt-4">
+                <div class="bg-white p-3 rounded-4 shadow-lg mb-4 mx-auto d-flex justify-content-center align-items-center"
+                    style="width: 240px; height: 240px;">
+                    <i class="ph ph-qr-code text-dark" style="font-size: 200px; line-height: 1;"></i>
+                </div>
+
+                <p class="fs-5 mb-2"
+                    style="color: var(--text-secondary); text-transform: uppercase; letter-spacing: 2px;">ATAU KETIK PIN
+                    DI PERANGKAT ANDA:</p>
+
+                <h1 id="dynamicPIN" class="fw-bold display-1 m-0"
+                    style="color: var(--color-primary); font-family: 'Monaco', monospace; font-size: 110px; letter-spacing: 16px;">
+                    A7X9
+                </h1>
+            </div>
+        </div>
+
+        <div class="col-4 h-100 border-start border-hairline d-flex flex-column"
+            style="background-color: var(--color-surface);">
+            <div class="p-4 border-bottom border-hairline d-flex justify-content-between align-items-center">
+                <h4 class="fw-bold mb-0 text-white">Log Kehadiran</h4>
+                <h3 class="fw-bold mb-0" style="color: var(--color-primary);"><span id="studentCount">0</span>/45</h3>
+            </div>
+
+            <div class="flex-grow-1 overflow-auto p-4" id="studentLogFeed">
+                <div class="text-center mt-5">
+                    <div class="spinner-border text-secondary mb-3" role="status"></div>
+                    <p style="color: var(--text-secondary);">Menunggu mahasiswa untuk memindai...</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const pinElement = document.getElementById('dynamicPIN');
+            const progressBar = document.getElementById('otpProgressBar');
+            const studentCountElem = document.getElementById('studentCount');
+            const logFeed = document.getElementById('studentLogFeed');
+
+            let count = 0;
+            const mockStudents = ["Russell Reece", "Nadiatu Dzaqiah", "Kautsar Rahman", "Ari Okta", "Arita Kya", "Jane Doe", "John Smith"];
+
+            // Fungsi Generator PIN Alfanumerik Acak
+            const generatePIN = () => {
+                return Math.random().toString(36).substring(2, 6).toUpperCase();
+            };
+
+            // SET PIN PERTAMA KALI SAAT HALAMAN DIMUAT (Agar tidak muncul A7X9)
+            pinElement.textContent = generatePIN();
+
+            // Loop OTP 10 Detik
+            setInterval(() => {
+                // 1. Ganti PIN
+                pinElement.textContent = generatePIN();
+
+                // 2. Beri efek kedip (flash) agar mata mahasiswa tertuju ke layar saat PIN berubah
+                pinElement.style.opacity = '0';
+                setTimeout(() => pinElement.style.opacity = '1', 150);
+
+                // 3. Reset Animasi Bar
+                progressBar.style.animation = 'none';
+                void progressBar.offsetWidth; // Trigger reflow
+                progressBar.style.animation = 'shrinkTimer 10s linear infinite';
+            }, 10000);
+
+            // Simulasi Real-time Log Siswa yang Masuk (Hanya untuk demo visual)
+            const simulateStudentJoin = setInterval(() => {
+                if (count < 45 && mockStudents.length > 0) {
+                    // Hapus pesan "menunggu" jika ini siswa pertama
+                    if (count === 0) logFeed.innerHTML = '';
+
+                    count++;
+                    studentCountElem.textContent = count;
+
+                    // Ambil siswa acak dari array
+                    const studentName = mockStudents.splice(Math.floor(Math.random() * mockStudents.length), 1)[0];
+
+                    const logItem = document.createElement('div');
+                    logItem.className = 'd-flex align-items-center p-3 mb-2 rounded bg-transparent border border-hairline';
+                    logItem.innerHTML = `
+                        <i class="ph-fill ph-check-circle fs-4 me-3" style="color: var(--color-primary);"></i>
+                        <div>
+                            <div class="fw-bold text-white">${studentName || `Mahasiswa #${count}`}</div>
+                            <div class="small" style="color: var(--text-secondary);">${new Date().toLocaleTimeString('id-ID')} WIB</div>
+                        </div>
+                    `;
+
+                    // Masukkan ke posisi teratas
+                    logFeed.prepend(logItem);
+                } else if (count >= 45) {
+                    clearInterval(simulateStudentJoin);
+                }
+            }, 3500); // Simulasi ada siswa yang memindai setiap 3.5 detik
+        });
+    </script>
+</body>
+
+</html>
