@@ -19,7 +19,7 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
         errorMsg.classList.add('d-none');
         
         // Redirect ke dashboard sesuai jenjang/level
-        const roleDir = foundUser.level === 'teacher' ? 'pages/teacher/' : 'pages/student/';
+        const roleDir = foundUser.level.toLowerCase() === 'teacher' ? 'pages/teacher/' : 'pages/student/';
         window.location.href = roleDir + foundUser.dashboardUrl;
     } else {
         // Tampilkan pesan error
