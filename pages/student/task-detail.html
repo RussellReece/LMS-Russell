@@ -25,7 +25,7 @@
             <div class="container py-4 px-md-5">
                 <!-- Back Button -->
                 <div class="mb-4">
-                    <a href="assessment.html" class="text-decoration-none fw-semibold" style="color: var(--text-secondary);">
+                    <a href="assessment.html" id="back-to-course-btn" class="text-decoration-none fw-semibold" style="color: var(--text-secondary);">
                         <i class="ph ph-arrow-left me-1"></i> Kembali ke Penugasan
                     </a>
                 </div>
@@ -63,7 +63,25 @@
                                     <button class="btn btn-sm btn-outline-primary"><i class="ph ph-download-simple"></i> Unduh</button>
                                 </div>
                             </div>
-
+                            <div class="mb-4 mt-4">
+                                <h6 class="fw-bold mb-3" style="color: var(--text-primary);">Draf & File Referensi Kerja</h6>
+                                <p class="small" style="color: var(--text-secondary);">Unggah draf (PDF, Word, Excel, PPT) atau materi referensi yang ingin Anda simpan sementara sebelum disubmit.</p>
+                                <div class="p-3 border border-dashed rounded text-center mb-2 hover-elevate" style="border-color: var(--border-hairline); background-color: rgba(0,0,0,0.02); cursor: pointer;">
+                                    <i class="ph-duotone ph-file-plus fs-2 mb-1" style="color: var(--text-secondary);"></i>
+                                    <div class="fw-semibold small" style="color: var(--text-secondary);">Pilih File Pendukung (Max 5MB)</div>
+                                </div>
+                                <!-- Contoh file yang sudah diunggah -->
+                                <div class="d-flex align-items-center justify-content-between p-2 border rounded bg-white shadow-sm mt-2">
+                                    <div class="d-flex align-items-center">
+                                        <i class="ph-fill ph-file-doc fs-4 text-primary me-2"></i>
+                                        <div>
+                                            <div class="small fw-semibold" style="color: var(--text-primary); line-height: 1.2;">Draft_Laporan_v1.docx</div>
+                                            <span class="small text-muted" style="font-size: 11px;">Baru saja diunggah</span>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-sm btn-light text-danger p-1 border-0"><i class="ph-bold ph-trash"></i></button>
+                                </div>
+                            </div>
                             <div id="task-collab-btn-container"></div>
                         </div>
                     </div>

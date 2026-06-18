@@ -1,4 +1,59 @@
 // Setup Global functions for external calling
+window.handleCollabNav = function(e) {
+    e.preventDefault();
+    const userStr = sessionStorage.getItem('loggedInUser');
+    if (!userStr) return;
+    const user = JSON.parse(userStr);
+    
+    if (!user.assignments) return;
+
+    const groupTasks = user.assignments.filter(t => t.isGroup);
+
+    let modalEl = document.getElementById('collabNavModal');
+    if (!modalEl) {
+        const modalHtml = `
+            <div class="modal fade" id="collabNavModal" tabindex="-1" aria-labelledby="collabNavModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content" style="background-color: var(--color-surface); border: 1px solid var(--border-hairline); border-radius: var(--radius-card);">
+                        <div class="modal-header border-bottom border-hairline">
+                            <h5 class="modal-title fw-bold" id="collabNavModalLabel" style="color: var(--text-primary);">
+                                <i class="ph-duotone ph-users-three text-primary me-2 fs-4"></i>Pilih Dokumen Kolaborasi
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-4" id="collabNavModalBody">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        modalEl = document.getElementById('collabNavModal');
+    }
+
+    const modalBody = document.getElementById('collabNavModalBody');
+    if (groupTasks.length === 0) {
+        modalBody.innerHTML = `<div class="text-center text-muted py-4"><i class="ph-duotone ph-folder-open fs-1 mb-2"></i><br>Belum ada tugas kelompok.</div>`;
+    } else {
+        modalBody.innerHTML = `<p class="small mb-3" style="color: var(--text-secondary);">Berikut adalah daftar tugas kelompok Anda. Pilih salah satu untuk membuka CollabSpace.</p>` +
+            `<div class="list-group list-group-flush">` + 
+            groupTasks.map(task => `
+                <a href="collab.html?taskId=${task.id}" class="list-group-item list-group-item-action d-flex align-items-center mb-2 rounded border" style="background-color: var(--bg-canvas); border-color: var(--border-hairline) !important; padding: 12px 16px;">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3 text-white" style="width: 40px; height: 40px; background-color: var(--color-primary);">
+                        <i class="ph-bold ph-rocket fs-5"></i>
+                    </div>
+                    <div class="flex-grow-1 overflow-hidden">
+                        <div class="fw-bold text-truncate" style="color: var(--text-primary); font-size: 15px;">${task.title}</div>
+                        <div class="small" style="color: var(--text-secondary);"><i class="ph ph-clock me-1"></i>Tenggat: ${task.deadline}</div>
+                    </div>
+                    <i class="ph-bold ph-caret-right ms-2" style="color: var(--text-secondary);"></i>
+                </a>
+            `).join('') + `</div>`;
+    }
+
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+};
 window.handleBackpackNav = function(e) {
     e.preventDefault();
     const userStr = sessionStorage.getItem('loggedInUser');
@@ -144,10 +199,10 @@ document.addEventListener('DOMContentLoaded', function () {
         progressContainer.innerHTML = user.enrolledCourses.slice(0, 3).map(course => `
             <div class="mb-3">
                 <div class="d-flex justify-content-between small mb-1">
-                    <span class="fw-semibold">${course.name}</span>
+                    <span class="fw-semibold text-truncate pe-2">${course.name}</span>
                     <span style="color: var(--text-secondary);">${course.progress}%</span>
                 </div>
-                <div class="progress" style="height: 8px; background-color: var(--color-surface); border-radius: var(--radius-btn);">
+                <div class="progress" style="height: 8px; background-color: var(--bg-canvas); border-radius: var(--radius-btn);">
                     <div class="progress-bar" style="width: ${course.progress}%; background-color: var(--color-primary); border-radius: var(--radius-btn);"></div>
                 </div>
             </div>
@@ -207,6 +262,49 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
         displayCourses('all');
+
+        // Course Distribution Logic
+        const distributionContainer = document.getElementById('course-distribution-container');
+        if (distributionContainer && user.courseDistribution) {
+            let html = `
+                <div class="table-responsive bg-white rounded shadow-sm border" style="border-color: var(--border-hairline) !important;">
+                    <table class="table table-bordered mb-0 align-middle text-center" style="font-size: 14px;">
+                        <thead style="background-color: #e9ecef; color: #555;">
+                            <tr>
+                                <th class="py-3" style="width: 8%;">SEMESTER</th>
+                                <th class="py-3">COURSE<br>CODE</th>
+                                <th class="py-3 text-start">COURSE NAME</th>
+                                <th class="py-3">CREDITS</th>
+                                <th class="py-3" style="width: 12%;">QUALITY<br>CONTROL<br>COURSE<br>(UJIAN<br>PENGAWASAN<br>MUTU)</th>
+                                <th class="py-3">GRADE<br>MINIMUM</th>
+                                <th class="py-3">GRADE</th>
+                                <th class="py-3">STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            user.courseDistribution.forEach(sem => {
+                sem.courses.forEach((course, index) => {
+                    html += `<tr>`;
+                    if (index === 0) {
+                        html += `<td rowspan="${sem.courses.length}" class="fw-semibold bg-light">${sem.semester}</td>`;
+                    }
+                    html += `
+                        <td class="text-muted">${course.code}</td>
+                        <td class="text-start" style="color: #444;">${course.name}</td>
+                        <td>${course.credits}</td>
+                        <td>${course.qc}</td>
+                        <td>${course.minGrade}</td>
+                        <td class="fw-semibold">${course.grade}</td>
+                        <td class="fw-bold" style="color: ${course.status === 'PASSED' ? 'var(--color-success)' : 'var(--color-danger)'};">${course.status}</td>
+                    </tr>`;
+                });
+            });
+            
+            html += `</tbody></table></div>`;
+            distributionContainer.innerHTML = html;
+        }
     }
 
     // ========================================================
@@ -227,93 +325,326 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('course-status-badge').classList.remove('d-none');
             }
 
-            // Render Accordion Syllabus
-            const accordionContainer = document.getElementById('courseAccordion');
-            if (accordionContainer && activeCourse.syllabus) {
-                accordionContainer.innerHTML = activeCourse.syllabus.map((materi, idx) => {
-                    const isExpanded = materi.status === 'Sedang Berjalan' ? 'show' : '';
-                    const isCollapsed = materi.status === 'Sedang Berjalan' ? '' : 'collapsed';
-                    const badgeColor = materi.status === 'Selesai' ? '#20c997' : 'var(--color-primary)';
+            // Render Tabbed Syllabus
+            const syllabusContainer = document.getElementById('courseAccordion');
+            if (syllabusContainer && activeCourse.syllabus) {
+                // Determine active tab
+                let activeIndex = activeCourse.syllabus.findIndex(m => m.status === 'Sedang Berjalan');
+                if (activeIndex === -1) activeIndex = activeCourse.syllabus.length - 1;
+                
+                // Hapus kelas accordion untuk menggunakan tab
+                syllabusContainer.className = 'syllabus-tabs-container';
 
-                    const listItemsHTML = materi.items.map(item => {
-                        // TIPE KHUSUS: ABSENSI BISA DILIPAT (COLLAPSE)
+                let tabsHTML = `<ul class="nav nav-pills mb-4 overflow-auto flex-nowrap pb-2" id="courseSyllabusTabs" role="tablist" style="border-bottom: 2px solid var(--color-surface); gap: 0.5rem; scrollbar-width: none;">`;
+                let contentHTML = `<div class="tab-content" id="courseSyllabusTabsContent">`;
+
+                activeCourse.syllabus.forEach((materi, idx) => {
+                    const isActive = idx === activeIndex;
+                    const badgeColor = materi.status === 'Selesai' ? '#20c997' : (materi.status === 'Sedang Berjalan' ? 'var(--color-primary)' : 'var(--text-secondary)');
+                    
+                    tabsHTML += `
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link ${isActive ? 'active' : ''} fw-bold d-flex align-items-center" id="tab-${idx}" data-bs-toggle="tab" data-bs-target="#content-${idx}" type="button" role="tab" style="border-radius: var(--radius-btn); white-space: nowrap; ${isActive ? '' : 'color: var(--text-secondary); background-color: var(--color-surface);'}">
+                                ${materi.title.includes('Minggu') || materi.title.includes('Sesi') ? materi.title.split(':')[0] : 'Sesi ' + materi.week}
+                                <span class="ms-2 rounded-circle d-inline-block" style="width: 8px; height: 8px; background-color: ${badgeColor};"></span>
+                            </button>
+                        </li>
+                    `;
+
+                    const listItemsHTMLNormal = materi.items.map(item => {
+                        let taskLink = '#';
+                        if (item.type === 'task') {
+                            const foundTask = user.assignments?.find(a => a.title === item.name);
+                            if (foundTask) taskLink = `task-detail.html?taskId=${foundTask.id}`;
+                        }
+
                         if (item.type === 'attendance') {
-                            const collapseId = `attendanceCollapse-${idx}`;
                             return `
-                                <li class="mb-4 rounded border border-primary overflow-hidden" style="background-color: var(--bg-canvas);">
-                                    <a href="#${collapseId}" data-bs-toggle="collapse" class="p-3 d-flex align-items-center text-decoration-none" style="cursor: pointer; background-color: rgba(var(--color-primary-rgb), 0.05);">
-                                        <i class="ph-duotone ph-scan fs-3 me-3" style="color: var(--color-primary);"></i>
-                                        <div>
-                                            <div class="fw-bold" style="color: var(--color-primary);">${item.name}</div>
-                                            <div class="small" style="color: var(--text-secondary);">Klik untuk memindai QR atau masukkan PIN</div>
-                                        </div>
-                                        <i class="ph-bold ph-caret-down ms-auto fs-5" style="color: var(--color-primary);"></i>
-                                    </a>
-                                    
-                                    <div class="collapse" id="${collapseId}">
-                                        <div class="p-3 border-top border-primary text-center d-flex flex-column align-items-center attendance-form-container">
-                                            
-                                            <div class="bg-white rounded d-flex align-items-center justify-content-center mb-2 shadow-sm" style="width: 100px; height: 100px; border: 2px dashed var(--border-hairline);">
-                                                <div class="text-center">
-                                                    <i class="ph ph-qr-code text-dark" style="font-size: 50px; line-height: 1;"></i>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="small fw-semibold mb-2" style="color: var(--text-secondary);">ATAU MASUKKAN PIN</div>
-                                            
-                                            <div class="d-flex gap-2 mb-3 justify-content-center">
-                                                <input type="text" class="form-control text-center fw-bold fs-4 p-2 pin-input" maxlength="1" style="width: 50px; height: 55px; border-radius: var(--radius-btn); background-color: var(--bg-canvas); border-color: var(--color-primary); color: var(--text-primary);">
-                                                <input type="text" class="form-control text-center fw-bold fs-4 p-2 pin-input" maxlength="1" style="width: 50px; height: 55px; border-radius: var(--radius-btn); background-color: var(--bg-canvas); border-color: var(--color-primary); color: var(--text-primary);">
-                                                <input type="text" class="form-control text-center fw-bold fs-4 p-2 pin-input" maxlength="1" style="width: 50px; height: 55px; border-radius: var(--radius-btn); background-color: var(--bg-canvas); border-color: var(--color-primary); color: var(--text-primary);">
-                                                <input type="text" class="form-control text-center fw-bold fs-4 p-2 pin-input" maxlength="1" style="width: 50px; height: 55px; border-radius: var(--radius-btn); background-color: var(--bg-canvas); border-color: var(--color-primary); color: var(--text-primary);">
-                                            </div>
-                                            
-                                            <button class="btn btn-primary fw-semibold w-100 py-2 btn-submit-absen" style="max-width: 250px;">Hadir Sekarang</button>
-                                        </div>
+                                <a href="#" class="d-flex align-items-center p-3 mb-3 bg-white border rounded shadow-sm hover-elevate transition-all text-decoration-none attendance-trigger" data-idx="${idx}" style="border-color: var(--border-hairline) !important;">
+                                    <div class="rounded p-2 me-3" style="background-color: rgba(var(--color-primary-rgb), 0.05);">
+                                        <i class="ph-duotone ph-scan fs-3" style="color: var(--color-primary);"></i>
                                     </div>
-                                </li>
+                                    <div>
+                                        <div class="fw-bold d-block mb-1" style="color: var(--color-primary); font-size: 15px;">${item.name}</div>
+                                        <div class="small mt-1" style="color: var(--text-secondary);">Klik untuk memindai QR di monitor guru</div>
+                                    </div>
+                                </a>
                             `;
                         }
 
-                        // TIPE STANDAR (Materi, Video, Tugas)
                         let iconClass = 'ph-file-pdf'; let iconColor = '#dc3545';
                         if (item.type === 'video') { iconClass = 'ph-video-camera'; iconColor = 'var(--color-primary)'; }
                         if (item.type === 'task') { iconClass = 'ph-clipboard-text'; iconColor = '#ffc107'; }
                         if (item.type === 'link') { iconClass = 'ph-link'; iconColor = '#0d6efd'; }
 
-                        const deadlineInfo = item.type === 'task' ? `<div class="small text-danger fw-semibold">${item.desc}</div>` : `<div class="small" style="color: var(--text-secondary);">${item.desc}</div>`;
+                        const deadlineInfo = item.type === 'task' ? `<div class="small text-danger fw-semibold mt-1">${item.desc}</div>` : `<div class="small mt-1" style="color: var(--text-secondary);">${item.desc}</div>`;
 
                         return `
-                            <li class="mb-3 d-flex align-items-start">
-                                <i class="ph-fill ${iconClass} me-3 fs-4" style="color: ${iconColor};"></i>
+                            <div class="d-flex align-items-start p-3 mb-3 bg-white border rounded shadow-sm hover-elevate transition-all" style="border-color: var(--border-hairline) !important;">
+                                <div class="rounded p-2 me-3" style="background-color: rgba(var(--color-primary-rgb), 0.05);">
+                                    <i class="ph-fill ${iconClass} fs-3" style="color: ${iconColor};"></i>
+                                </div>
                                 <div>
-                                    <a href="#" class="fw-semibold text-decoration-none" style="color: var(--text-primary);">${item.name}</a>
+                                    <a href="${taskLink}" class="fw-bold text-decoration-none d-block mb-1 hover-elevate" style="color: var(--text-primary); font-size: 15px;">${item.name}</a>
                                     ${deadlineInfo}
                                 </div>
-                            </li>
+                                <a href="${taskLink}" class="btn btn-sm btn-light ms-auto mt-2 rounded-circle"><i class="ph-bold ${item.type === 'task' ? 'ph-arrow-right' : 'ph-download-simple'}"></i></a>
+                            </div>
                         `;
                     }).join('');
 
-                    return `
-                        <div class="accordion-item mb-3 border-0">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button syllabus-btn ${isCollapsed} rounded fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#week${idx}">
-                                    <div class="d-flex align-items-center w-100">
-                                        <span class="me-3">${materi.title}</span>
-                                        <span class="badge ms-auto fw-normal" style="background-color: ${badgeColor}; color: white;">${materi.status}</span>
+                    const listItemsHTMLCard = materi.items.map(item => {
+                        let taskLink = '#';
+                        if (item.type === 'task') {
+                            const foundTask = user.assignments?.find(a => a.title === item.name);
+                            if (foundTask) taskLink = `task-detail.html?taskId=${foundTask.id}`;
+                        }
+
+                        if (item.type === 'attendance') {
+                            return `
+                                <a href="#" class="d-flex align-items-center mb-4 text-white text-decoration-none attendance-trigger" data-idx="${idx}">
+                                    <div class="bg-white rounded d-flex align-items-center justify-content-center me-3 position-relative" style="width: 45px; height: 45px; color: var(--color-primary);">
+                                        <i class="ph-bold ph-scan fs-4"></i>
+                                        <span class="position-absolute top-0 start-0 translate-middle p-1 bg-success border border-light rounded-circle" style="width: 15px; height: 15px;"><i class="ph-bold ph-check text-white" style="font-size: 8px; position:absolute; top:2px; left:2px;"></i></span>
                                     </div>
-                                </button>
-                            </h2>
-                            <div id="week${idx}" class="accordion-collapse collapse ${isExpanded}" data-bs-parent="#courseAccordion">
-                                <div class="accordion-body px-4 py-3 mt-2 rounded" style="background-color: var(--color-surface); border-left: 3px solid var(--color-primary);">
-                                    <ul class="list-unstyled mb-0 syllabus-list">
-                                        ${listItemsHTML.length > 0 ? listItemsHTML : '<li class="text-muted small">Materi belum tersedia.</li>'}
+                                    <div class="flex-grow-1">
+                                        <div class="fw-semibold" style="font-size: 14px;">${item.name}</div>
+                                        <div class="small" style="font-size: 12px; opacity: 0.9;">• 1h 40m</div>
+                                    </div>
+                                </a>
+                            `;
+                        }
+
+                        let iconClass = 'ph-file-pdf'; 
+                        if (item.type === 'video') iconClass = 'ph-video-camera';
+                        if (item.type === 'task') iconClass = 'ph-clipboard-text';
+                        if (item.type === 'link') iconClass = 'ph-link';
+
+                        return `
+                            <div class="d-flex align-items-center mb-4 text-white">
+                                <div class="bg-white rounded d-flex align-items-center justify-content-center me-3 position-relative" style="width: 45px; height: 45px; color: var(--color-primary);">
+                                    <i class="ph-bold ${iconClass} fs-4"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <a href="${taskLink}" class="text-white text-decoration-none d-block hover-elevate">
+                                        <div class="fw-semibold" style="font-size: 14px;">${item.name}</div>
+                                        <div class="small" style="font-size: 12px; opacity: 0.9;">• 10m</div>
+                                    </a>
+                                </div>
+                                <a href="${taskLink}" class="btn btn-sm text-white ms-auto rounded-circle" style="background-color: rgba(255,255,255,0.2); width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ${item.type === 'task' ? 'ph-arrow-right' : 'ph-download-simple'} fs-6"></i></a>
+                            </div>
+                        `;
+                    }).join('');
+
+                    const learningOutcomeHTML = `
+                        <div class="mb-4">
+                            <button class="btn btn-sm text-start p-0 d-flex align-items-center fw-semibold w-100" type="button" data-bs-toggle="collapse" data-bs-target="#lo-${idx}" aria-expanded="false" style="color: var(--color-primary);">
+                                <i class="ph-bold ph-caret-right me-2 transition-transform" id="icon-lo-${idx}"></i> Lihat Learning Outcome & Sub Topik
+                            </button>
+                            <div class="collapse mt-3" id="lo-${idx}">
+                                <div class="p-0 border-0 bg-transparent">
+                                    <h6 class="fw-bold mb-2" style="color: var(--text-primary); font-size: 14px;">Learning Outcome</h6>
+                                    <ul class="small mb-3 ps-3 text-muted" style="color: var(--color-primary) !important;">
+                                        <li>CPMK 3: Menjelaskan komponen antarmuka pengguna dan fitur utama HTML 5</li>
+                                        <li>CPMK 4: Mengembangkan aplikasi web seluler berdasarkan HTML 5</li>
+                                    </ul>
+                                    <h6 class="fw-bold mb-2" style="color: var(--text-primary); font-size: 14px;">Sub Topic</h6>
+                                    <ul class="small mb-0 ps-3 text-muted" style="color: var(--color-primary) !important;">
+                                        <li>Container vs UI Component</li>
+                                        <li>Form</li>
+                                        <li>Handling Events</li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
                     `;
-                }).join('');
+
+                    contentHTML += `
+                        <div class="tab-pane fade ${isActive ? 'show active' : ''}" id="content-${idx}" role="tabpanel">
+                            <div class="row g-4 transition-all" id="row-${idx}">
+                                <div class="col-12 transition-all" id="col-info-${idx}">
+                                    <div id="info-content-${idx}" class="d-block transition-all">
+                                        <h4 class="fw-normal mb-3" style="color: var(--text-primary); font-size: 22px;">${materi.week} Component State and Props [L]</h4>
+                                        
+                                        ${learningOutcomeHTML}
+                                    </div>
+                                    <div id="scanner-container-${idx}" class="d-none transition-all">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h5 class="fw-bold mb-0" style="color: var(--text-primary);">Presensi Berjalan</h5>
+                                            <button class="btn btn-sm btn-outline-secondary btn-close-scanner" data-idx="${idx}"><i class="ph ph-x"></i> Kembali</button>
+                                        </div>
+                                        <div class="p-4 border border-primary rounded text-center d-flex flex-column align-items-center attendance-form-container" style="background-color: var(--bg-canvas);">
+                                            <div class="bg-dark rounded d-flex flex-column align-items-center justify-content-center mb-3 position-relative overflow-hidden shadow-inner" style="width: 100%; max-width: 320px; height: 220px; border: 2px solid var(--text-secondary);">
+                                                <div class="position-absolute w-100 h-100" style="background: rgba(0,0,0,0.5);"></div>
+                                                <div class="position-absolute" style="width: 200px; height: 200px; border: 2px solid #0f0; border-radius: 12px; box-shadow: 0 0 0 1000px rgba(0,0,0,0.6);">
+                                                    <div class="w-100 position-absolute scan-line" style="height: 2px; background: #0f0; top: 0; box-shadow: 0 0 8px #0f0;"></div>
+                                                </div>
+                                                <style>
+                                                    @keyframes scanAnim {
+                                                        0% { top: 0%; }
+                                                        50% { top: 100%; }
+                                                        100% { top: 0%; }
+                                                    }
+                                                    .scan-line { animation: scanAnim 3s infinite linear; }
+                                                </style>
+                                                <div class="text-center position-relative z-3">
+                                                    <i class="ph-duotone ph-camera text-white mb-2" style="font-size: 32px; opacity: 0.8;"></i>
+                                                    <p class="small text-white mb-0 px-3" style="opacity: 0.9;">Arahkan kamera ke QR Code di layar proyektor / dosen</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="small fw-semibold mb-2 mt-2" style="color: var(--text-secondary);">ATAU MASUKKAN PIN MANUAL</div>
+                                            
+                                            <div class="d-flex gap-2 mb-4 justify-content-center">
+                                                <input type="text" class="form-control text-center fw-bold fs-4 p-2 pin-input" maxlength="1" style="width: 55px; height: 60px; border-radius: var(--radius-btn); background-color: var(--bg-canvas); border-color: var(--border-hairline); color: var(--text-primary);">
+                                                <input type="text" class="form-control text-center fw-bold fs-4 p-2 pin-input" maxlength="1" style="width: 55px; height: 60px; border-radius: var(--radius-btn); background-color: var(--bg-canvas); border-color: var(--border-hairline); color: var(--text-primary);">
+                                                <input type="text" class="form-control text-center fw-bold fs-4 p-2 pin-input" maxlength="1" style="width: 55px; height: 60px; border-radius: var(--radius-btn); background-color: var(--bg-canvas); border-color: var(--border-hairline); color: var(--text-primary);">
+                                                <input type="text" class="form-control text-center fw-bold fs-4 p-2 pin-input" maxlength="1" style="width: 55px; height: 60px; border-radius: var(--radius-btn); background-color: var(--bg-canvas); border-color: var(--border-hairline); color: var(--text-primary);">
+                                            </div>
+                                            
+                                            <button class="btn btn-primary fw-bold w-100 py-3 btn-submit-absen" style="max-width: 320px; border-radius: var(--radius-btn);">Hadir Sekarang</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 transition-all" id="col-materi-${idx}">
+                                    <!-- View Default (Gambar 1) -->
+                                    <div id="materi-normal-view-${idx}" class="d-block transition-all">
+                                        <h5 class="fw-bold mb-4" style="color: var(--text-primary);">Materi & Aktivitas</h5>
+                                        ${listItemsHTMLNormal.length > 0 ? listItemsHTMLNormal : '<div class="text-muted">Belum ada materi</div>'}
+                                    </div>
+                                    
+                                    <!-- View Card (Gambar 2) -->
+                                    <div id="materi-card-view-${idx}" class="d-none h-100 transition-all">
+                                        <div class="card border-0 shadow-sm rounded-3 overflow-hidden h-100" style="background-color: var(--color-primary);">
+                                            <div class="card-header border-0 p-3 pb-2 text-white bg-transparent" style="font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.2) !important;">
+                                                Things to do in this session
+                                            </div>
+                                            <div class="card-body p-4 bg-transparent pt-3">
+                                                ${listItemsHTMLCard.length > 0 ? listItemsHTMLCard : '<div class="text-center p-4 text-white"><i class="ph-duotone ph-folder-open fs-1 mb-2"></i><br>Belum ada materi</div>'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                tabsHTML += `</ul>`;
+                contentHTML += `</div>`;
+                
+                syllabusContainer.innerHTML = tabsHTML + contentHTML;
+
+                // Bind Attendance Trigger
+                syllabusContainer.querySelectorAll('.attendance-trigger').forEach(trigger => {
+                    trigger.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const idx = e.currentTarget.getAttribute('data-idx');
+                        
+                        // Enforce split layout if not split
+                        const colInfo = syllabusContainer.querySelector(`#col-info-${idx}`);
+                        const colMateri = syllabusContainer.querySelector(`#col-materi-${idx}`);
+                        const normalView = syllabusContainer.querySelector(`#materi-normal-view-${idx}`);
+                        const cardView = syllabusContainer.querySelector(`#materi-card-view-${idx}`);
+                        
+                        if(colInfo && colMateri && normalView && cardView) {
+                            colInfo.classList.remove('col-12'); colInfo.classList.add('col-lg-7');
+                            colMateri.classList.remove('col-12'); colMateri.classList.add('col-lg-5');
+                            normalView.classList.remove('d-block'); normalView.classList.add('d-none');
+                            cardView.classList.remove('d-none'); cardView.classList.add('d-block');
+                        }
+
+                        // Swap info to scanner
+                        syllabusContainer.querySelector(`#info-content-${idx}`).classList.add('d-none');
+                        syllabusContainer.querySelector(`#scanner-container-${idx}`).classList.remove('d-none');
+                    });
+                });
+
+                // Bind Close Scanner
+                syllabusContainer.querySelectorAll('.btn-close-scanner').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const idx = e.currentTarget.getAttribute('data-idx');
+                        syllabusContainer.querySelector(`#info-content-${idx}`).classList.remove('d-none');
+                        syllabusContainer.querySelector(`#scanner-container-${idx}`).classList.add('d-none');
+                        
+                        // Check if LO is collapsed, if so revert to single column
+                        const loCollapse = syllabusContainer.querySelector(`#lo-${idx}`);
+                        if (!loCollapse.classList.contains('show')) {
+                            const colInfo = syllabusContainer.querySelector(`#col-info-${idx}`);
+                            const colMateri = syllabusContainer.querySelector(`#col-materi-${idx}`);
+                            const normalView = syllabusContainer.querySelector(`#materi-normal-view-${idx}`);
+                            const cardView = syllabusContainer.querySelector(`#materi-card-view-${idx}`);
+                            
+                            if(colInfo && colMateri && normalView && cardView) {
+                                colInfo.classList.remove('col-lg-7'); colInfo.classList.add('col-12');
+                                colMateri.classList.remove('col-lg-5'); colMateri.classList.add('col-12');
+                                normalView.classList.remove('d-none'); normalView.classList.add('d-block');
+                                cardView.classList.remove('d-block'); cardView.classList.add('d-none');
+                            }
+                        }
+                    });
+                });
+
+                // Animasi icon caret pada collapse Learning Outcome dan Ganti Layout
+                const collapses = syllabusContainer.querySelectorAll('.collapse');
+                collapses.forEach(collapse => {
+                    collapse.addEventListener('show.bs.collapse', (e) => {
+                        const idx = e.target.id.split('-')[1];
+                        if (idx === undefined) return;
+                        const icon = syllabusContainer.querySelector(`#icon-lo-${idx}`);
+                        if(icon) { icon.classList.remove('ph-caret-right'); icon.classList.add('ph-caret-down'); }
+                        
+                        // Ubah Layout
+                        const colInfo = syllabusContainer.querySelector(`#col-info-${idx}`);
+                        const colMateri = syllabusContainer.querySelector(`#col-materi-${idx}`);
+                        const normalView = syllabusContainer.querySelector(`#materi-normal-view-${idx}`);
+                        const cardView = syllabusContainer.querySelector(`#materi-card-view-${idx}`);
+                        
+                        if(colInfo && colMateri && normalView && cardView) {
+                            colInfo.classList.remove('col-12');
+                            colInfo.classList.add('col-lg-7');
+                            
+                            colMateri.classList.remove('col-12');
+                            colMateri.classList.add('col-lg-5');
+                            
+                            normalView.classList.remove('d-block');
+                            normalView.classList.add('d-none');
+                            
+                            cardView.classList.remove('d-none');
+                            cardView.classList.add('d-block');
+                        }
+                    });
+                    collapse.addEventListener('hide.bs.collapse', (e) => {
+                        const idx = e.target.id.split('-')[1];
+                        if (idx === undefined) return;
+                        const icon = syllabusContainer.querySelector(`#icon-lo-${idx}`);
+                        if(icon) { icon.classList.remove('ph-caret-down'); icon.classList.add('ph-caret-right'); }
+                        
+                        // Jika scanner sedang aktif, jangan kembalikan layout ke 1 kolom
+                        const scannerContainer = syllabusContainer.querySelector(`#scanner-container-${idx}`);
+                        if (!scannerContainer.classList.contains('d-none')) return;
+
+                        // Kembalikan Layout
+                        const colInfo = syllabusContainer.querySelector(`#col-info-${idx}`);
+                        const colMateri = syllabusContainer.querySelector(`#col-materi-${idx}`);
+                        const normalView = syllabusContainer.querySelector(`#materi-normal-view-${idx}`);
+                        const cardView = syllabusContainer.querySelector(`#materi-card-view-${idx}`);
+                        
+                        if(colInfo && colMateri && normalView && cardView) {
+                            colInfo.classList.remove('col-lg-7');
+                            colInfo.classList.add('col-12');
+                            
+                            colMateri.classList.remove('col-lg-5');
+                            colMateri.classList.add('col-12');
+                            
+                            normalView.classList.remove('d-none');
+                            normalView.classList.add('d-block');
+                            
+                            cardView.classList.remove('d-block');
+                            cardView.classList.add('d-none');
+                        }
+                    });
+                });
             }
 
         }
@@ -394,7 +725,116 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         });
+
+        // =======================================================
+        // TAMBAHAN BARU: RENDERING PEOPLE & ATTENDANCE
+        // =======================================================
+        const peopleContainer = document.getElementById('course-people-container');
+        const attendanceContainer = document.getElementById('course-attendance-container');
+
+        if (peopleContainer && user.classmates) {
+            let html = `
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold mb-0" style="color: var(--text-primary);">People in This Course</h5>
+                    <div class="input-group input-group-sm" style="width: 200px;">
+                        <input type="text" class="form-control" placeholder="Search..." style="border-radius: var(--radius-btn) 0 0 var(--radius-btn);">
+                        <button class="btn btn-outline-secondary" style="border-radius: 0 var(--radius-btn) var(--radius-btn) 0;"><i class="ph-bold ph-magnifying-glass"></i></button>
+                    </div>
+                </div>
+                <div class="table-responsive rounded border" style="border-color: var(--border-hairline) !important;">
+                    <table class="table mb-0 align-middle">
+                        <thead style="background-color: #f8f9fa;">
+                            <tr>
+                                <th class="py-3 text-muted small fw-semibold border-0" style="width: 30%;">NAME</th>
+                                <th class="py-3 text-muted small fw-semibold border-0">NIM</th>
+                                <th class="py-3 text-muted small fw-semibold border-0">ROLE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            user.classmates.forEach(person => {
+                html += `
+                    <tr>
+                        <td class="py-3 border-bottom border-hairline">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center me-3 fw-bold text-white shadow-sm" style="width: 36px; height: 36px; background-color: var(--color-primary);">${person.name.charAt(0)}</div>
+                                <div>
+                                    <div class="fw-semibold" style="color: var(--text-primary); font-size: 14px;">${person.name}</div>
+                                    <div class="small text-muted" style="font-size: 12px;">${person.email}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3 border-bottom border-hairline" style="color: var(--text-secondary); font-size: 14px;">${person.nim}</td>
+                        <td class="py-3 border-bottom border-hairline"><span class="badge bg-light text-dark border">Student</span></td>
+                    </tr>
+                `;
+            });
+            html += `</tbody></table></div>`;
+            peopleContainer.innerHTML = html;
+        }
+
+        if (attendanceContainer && user.attendanceData) {
+            let sumHTML = `
+                <div class="row g-0 mb-4 bg-white rounded border overflow-hidden shadow-sm" style="border-color: var(--border-hairline) !important;">
+                    <div class="col-md-3 p-4 border-end d-flex align-items-center">
+                        <div class="text-muted fs-5">Attendance<br>Summary</div>
+                    </div>
+                    <div class="col-md-9 d-flex">
+                        <div class="flex-grow-1 p-4 border-end text-center d-flex flex-column justify-content-center">
+                            <div class="small text-muted mb-1">Total Session</div>
+                            <div class="fs-1 fw-light" style="color: var(--text-primary);">${user.attendanceData.summary.totalSession}</div>
+                        </div>
+                        <div class="flex-grow-1 p-4 border-end text-center d-flex flex-column justify-content-center">
+                            <div class="small text-muted mb-1">Total Attendance</div>
+                            <div class="fs-1 fw-light" style="color: var(--text-primary);">${user.attendanceData.summary.totalAttendance}</div>
+                        </div>
+                        <div class="flex-grow-1 p-4 text-center d-flex flex-column justify-content-center">
+                            <div class="small text-muted mb-1">Minimal Attendance</div>
+                            <div class="fs-1 fw-light" style="color: var(--text-primary);">${user.attendanceData.summary.minimalAttendance}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive bg-white rounded border shadow-sm" style="border-color: var(--border-hairline) !important;">
+                    <table class="table mb-0 align-middle text-center" style="font-size: 13px;">
+                        <thead style="background-color: #f8f9fa;">
+                            <tr>
+                                <th class="py-3 border-0 text-start ps-4">Session <i class="ph-fill ph-caret-up ms-1 text-muted"></i></th>
+                                <th class="py-3 border-0">Delivery <i class="ph-fill ph-caret-up ms-1 text-muted"></i></th>
+                                <th class="py-3 border-0">Start Date <i class="ph-fill ph-caret-up ms-1 text-muted"></i></th>
+                                <th class="py-3 border-0">End Date <i class="ph-fill ph-caret-up ms-1 text-muted"></i></th>
+                                <th class="py-3 border-0">Attend <i class="ph-fill ph-caret-up ms-1 text-muted"></i></th>
+                                <th class="py-3 border-0">Attendance Requirements</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            user.attendanceData.history.forEach(row => {
+                const attendIcon = row.status === 'present' 
+                    ? `<i class="ph-fill ph-check-circle text-success fs-4"></i>` 
+                    : `<i class="ph-fill ph-x-circle text-danger fs-4"></i>`;
+                
+                sumHTML += `
+                    <tr style="border-bottom: 1px solid #eaeaea;">
+                        <td class="py-3 text-start ps-4 text-muted">${row.session}</td>
+                        <td class="py-3 text-muted">${row.delivery}</td>
+                        <td class="py-3 text-muted">${row.startDate.replace(', ', '<br>')}</td>
+                        <td class="py-3 text-muted">${row.endDate.replace(', ', '<br>')}</td>
+                        <td class="py-3">${attendIcon}</td>
+                        <td class="py-3">
+                            <span class="badge bg-success-subtle text-success border border-success rounded d-inline-flex align-items-center">
+                                <i class="ph-bold ph-check me-1"></i> ${row.req}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            sumHTML += `</tbody></table></div>`;
+            attendanceContainer.innerHTML = sumHTML;
+        }
     }
+
 
     // ========================================================
     // LOGIKA HALAMAN TASK DETAIL (`task-detail.html`)
@@ -417,9 +857,15 @@ document.addEventListener('DOMContentLoaded', function () {
             const deadlineEl = document.getElementById('task-detail-deadline');
             const statusBadgeEl = document.getElementById('task-status-badge');
             
-            if (titleEl) titleEl.textContent = activeTask.title;
+            if (titleEl) titleEl.innerHTML = `${activeTask.title} <button class="btn btn-sm btn-outline-primary ms-3 fw-semibold" onclick="handleBackpackNav(event)" style="border-radius: var(--radius-btn); vertical-align: middle; font-size: 14px;"><i class="ph-bold ph-folder-open me-1"></i> Buka Folder Tugas</button>`;
             if (courseEl) courseEl.innerHTML = `<i class="ph ph-book-open me-1"></i> ${course ? course.name : 'Mata Kuliah'}`;
             if (deadlineEl) deadlineEl.innerHTML = `<i class="ph ph-clock me-1"></i> Tenggat: ${activeTask.deadline}`;
+            
+            const backBtn = document.getElementById('back-to-course-btn');
+            if (backBtn && course) {
+                backBtn.href = `course-detail.html?courseId=${course.id}`;
+                backBtn.innerHTML = `<i class="ph ph-arrow-left me-1"></i> Kembali ke ${course.name}`;
+            }
             
             if (statusBadgeEl) {
                 let badgeClass = 'bg-secondary';
@@ -1039,6 +1485,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const treeContainer = document.getElementById('backpack-tree');
         const emptyState = document.getElementById('backpack-empty-state');
         const btnSimEnroll = document.getElementById('btn-sim-enroll');
+        const btnOpenCloud = document.getElementById('btn-open-cloud');
+        const btnOnedrive = document.getElementById('btn-connect-onedrive');
+        const statusOnedrive = document.getElementById('onedrive-status');
 
         // Function to render tree
         const renderTree = (node) => {
@@ -1057,14 +1506,36 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const updateBackpackUI = () => {
             if (user.backpack && user.backpack.connected) {
-                statusGdrive.innerHTML = '<span class="text-success fw-bold"><i class="ph-bold ph-check-circle me-1"></i>Connected</span>';
-                statusGdrive.classList.remove('text-muted');
-                btnGdrive.textContent = 'Disconnect';
-                btnGdrive.classList.replace('btn-outline-primary', 'btn-outline-danger');
+                if (user.backpack.provider === 'gdrive') {
+                    statusGdrive.innerHTML = '<span class="text-success fw-bold"><i class="ph-bold ph-check-circle me-1"></i>Connected</span>';
+                    statusGdrive.classList.remove('text-muted');
+                    btnGdrive.textContent = 'Disconnect';
+                    btnGdrive.classList.replace('btn-outline-primary', 'btn-outline-danger');
+                    if (btnOnedrive) btnOnedrive.disabled = true;
+                    if (btnOpenCloud) {
+                        btnOpenCloud.innerHTML = '<i class="ph-bold ph-arrow-square-out me-1"></i> Buka di Google Drive';
+                        btnOpenCloud.href = 'https://drive.google.com/drive/my-drive';
+                    }
+                } else if (user.backpack.provider === 'onedrive') {
+                    if (statusOnedrive) {
+                        statusOnedrive.innerHTML = '<span class="text-success fw-bold"><i class="ph-bold ph-check-circle me-1"></i>Connected</span>';
+                        statusOnedrive.classList.remove('text-muted');
+                    }
+                    if (btnOnedrive) {
+                        btnOnedrive.textContent = 'Disconnect';
+                        btnOnedrive.classList.replace('btn-outline-primary', 'btn-outline-danger');
+                    }
+                    if (btnGdrive) btnGdrive.disabled = true;
+                    if (btnOpenCloud) {
+                        btnOpenCloud.innerHTML = '<i class="ph-bold ph-arrow-square-out me-1"></i> Buka di OneDrive';
+                        btnOpenCloud.href = 'https://onedrive.live.com';
+                    }
+                }
                 
                 emptyState.classList.add('d-none');
                 treeContainer.classList.remove('d-none');
                 btnSimEnroll.classList.remove('d-none');
+                if (btnOpenCloud) btnOpenCloud.classList.remove('d-none');
 
                 // Render tree
                 let treeHtml = '';
@@ -1098,10 +1569,65 @@ document.addEventListener('DOMContentLoaded', function () {
                     statusGdrive.classList.add('text-muted');
                     btnGdrive.textContent = 'Tautkan';
                     btnGdrive.classList.replace('btn-outline-danger', 'btn-outline-primary');
+                    btnGdrive.disabled = false;
+                    
+                    if (statusOnedrive) {
+                        statusOnedrive.innerHTML = 'Belum terhubung';
+                        statusOnedrive.classList.add('text-muted');
+                    }
+                    if (btnOnedrive) {
+                        btnOnedrive.textContent = 'Tautkan';
+                        btnOnedrive.classList.replace('btn-outline-danger', 'btn-outline-primary');
+                        btnOnedrive.disabled = false;
+                    }
                     
                     emptyState.classList.remove('d-none');
                     treeContainer.classList.add('d-none');
                     btnSimEnroll.classList.add('d-none');
+                    if (btnOpenCloud) btnOpenCloud.classList.add('d-none');
+                }
+            });
+        }
+
+        if (btnOnedrive) {
+            btnOnedrive.addEventListener('click', () => {
+                if (!user.backpack) {
+                    user.backpack = { connected: false, provider: null, structure: [] };
+                }
+                
+                if (!user.backpack.connected) {
+                    btnOnedrive.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menghubungkan...';
+                    setTimeout(() => {
+                        user.backpack.connected = true;
+                        user.backpack.provider = 'onedrive';
+                        if (user.backpack.structure.length === 0) {
+                            user.backpack.structure = [{ id: 'root', name: 'LMS_Backpack', type: 'folder', children: [] }];
+                        }
+                        updateBackpackUI();
+                    }, 1500);
+                } else {
+                    user.backpack.connected = false;
+                    user.backpack.provider = null;
+                    statusOnedrive.innerHTML = 'Belum terhubung';
+                    statusOnedrive.classList.add('text-muted');
+                    btnOnedrive.textContent = 'Tautkan';
+                    btnOnedrive.classList.replace('btn-outline-danger', 'btn-outline-primary');
+                    btnOnedrive.disabled = false;
+                    
+                    if (statusGdrive) {
+                        statusGdrive.innerHTML = 'Belum terhubung';
+                        statusGdrive.classList.add('text-muted');
+                    }
+                    if (btnGdrive) {
+                        btnGdrive.textContent = 'Tautkan';
+                        btnGdrive.classList.replace('btn-outline-danger', 'btn-outline-primary');
+                        btnGdrive.disabled = false;
+                    }
+                    
+                    emptyState.classList.remove('d-none');
+                    treeContainer.classList.add('d-none');
+                    btnSimEnroll.classList.add('d-none');
+                    if (btnOpenCloud) btnOpenCloud.classList.add('d-none');
                 }
             });
         }
@@ -1139,6 +1665,22 @@ document.addEventListener('DOMContentLoaded', function () {
     // LOGIKA HALAMAN COLLABSPACE (STUDENT)
     // ========================================================
     if (currentPage === 'collab') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const taskId = urlParams.get('taskId') || 2;
+        
+        const btnBackToTask = document.getElementById('btn-back-to-task');
+        if (btnBackToTask) {
+            btnBackToTask.href = `task-detail.html?taskId=${taskId}`;
+        }
+        
+        if (user.assignments) {
+            const activeTask = user.assignments.find(t => t.id == taskId);
+            if (activeTask) {
+                const titleEl = document.getElementById('collab-doc-title');
+                if (titleEl) titleEl.textContent = `Collab: ${activeTask.title}`;
+            }
+        }
+
         const renderBlock = (block, isDiff = false, diffType = '') => {
             let diffClass = '';
             if (isDiff) {
@@ -1192,4 +1734,245 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
+
+    // ========================================================
+    // LOGIKA HALAMAN GRADES (`grades.html`)
+    // ========================================================
+    if (currentPage === 'grades') {
+        const gradingContainer = document.getElementById('grading-visualization-container');
+        if (gradingContainer) {
+            if (user.detailedGrades) {
+                let html = `
+                    <div class="table-responsive bg-white rounded shadow-sm border" style="border-color: var(--border-hairline) !important;">
+                        <table class="table table-bordered mb-0 align-middle text-center" style="font-size: 14px;">
+                            <thead style="background-color: #e9ecef; color: #555;">
+                                <tr>
+                                    <th class="py-3" style="width: 8%;">SCU</th>
+                                    <th class="py-3 text-start">COMPONENT</th>
+                                    <th class="py-3">WEIGHT</th>
+                                    <th class="py-3">SCORE</th>
+                                    <th class="py-3">TOTAL</th>
+                                    <th class="py-3">GRADE</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                user.detailedGrades.forEach(course => {
+                    const rowCount = course.components.length;
+                    course.components.forEach((comp, index) => {
+                        html += `<tr>`;
+                        if (index === 0) {
+                            html += `
+                                <td rowspan="${rowCount}" class="fw-semibold bg-light" style="color: var(--text-primary); vertical-align: middle;">${course.scu}</td>
+                            `;
+                        }
+                        
+                        html += `
+                            <td class="text-start text-muted">${comp.name}</td>
+                            <td class="text-muted">${comp.weight}</td>
+                            <td class="fw-semibold" style="color: #444;">${comp.score}</td>
+                        `;
+                        
+                        if (index === 0) {
+                            html += `
+                                <td rowspan="${rowCount}" class="fw-semibold text-muted" style="vertical-align: middle;">${course.total}</td>
+                                <td rowspan="${rowCount}" class="fw-semibold text-muted" style="vertical-align: middle;">${course.grade}</td>
+                            `;
+                        }
+                        html += `</tr>`;
+                    });
+                });
+                
+                html += `</tbody></table></div>`;
+                gradingContainer.innerHTML = html;
+            } else {
+                gradingContainer.innerHTML = `<div class="text-center py-5 text-muted small"><i class="ph-duotone ph-warning-circle fs-1 mb-2"></i><div>Data nilai belum tersedia.</div></div>`;
+            }
+        }
+    }
+
+    // ========================================================
+    // LOGIKA HALAMAN FINANCE (`finance.html`)
+    // ========================================================
+    if (currentPage === 'finance') {
+        const summaryContainer = document.getElementById('finance-summary-container');
+        const tableContainer = document.getElementById('finance-table-container');
+
+        if (user.financeData) {
+            // Render Summary
+            if (summaryContainer) {
+                summaryContainer.innerHTML = `
+                    <div class="row gx-5 gy-2">
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted small">Total Billing <span style="font-size: 10px;">(TOTAL TAGIHAN)</span></span>
+                                <span class="fw-semibold">: Rp <span class="float-end ms-2">${user.financeData.summary.totalBilling}</span></span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted small">Total Payment <span style="font-size: 10px;">(TOTAL PEMBAYARAN)</span></span>
+                                <span class="fw-semibold">: Rp <span class="float-end ms-2">${user.financeData.summary.totalPayment}</span></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted small">Deposit <span style="font-size: 10px;">(DEPOSIT)</span></span>
+                                <span class="fw-semibold">: Rp <span class="float-end ms-2">${user.financeData.summary.deposit}</span></span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted small">Outstanding Payment <span style="font-size: 10px;">(SISA TAGIHAN)</span></span>
+                                <span class="fw-semibold">: Rp <span class="float-end ms-2">${user.financeData.summary.outstandingPayment}</span></span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Render Table
+            if (tableContainer) {
+                let html = `
+                    <div class="table-responsive bg-white rounded border" style="border-color: var(--border-hairline) !important;">
+                        <table class="table mb-0 align-middle text-center" style="font-size: 13px;">
+                            <thead style="background-color: #e9ecef; color: #555;">
+                                <tr>
+                                    <th class="py-3" style="width: 5%;">NO. <i class="ph-fill ph-caret-up ms-1" style="color: var(--color-primary);"></i></th>
+                                    <th class="py-3">PERIOD<br><span style="font-size: 10px;">(PERIODE)</span> <i class="ph-fill ph-caret-up ms-1 text-muted"></i></th>
+                                    <th class="py-3 text-start">DESCRIPTION<br><span style="font-size: 10px;">(DESKRIPSI)</span></th>
+                                    <th class="py-3">DUE DATE<br><span style="font-size: 10px;">(JATUH TEMPO)</span> <i class="ph-fill ph-caret-up ms-1 text-muted"></i></th>
+                                    <th class="py-3 text-end">BILLING (Rp)<br><span style="font-size: 10px;">(TAGIHAN (Rp))</span> <i class="ph-fill ph-caret-up ms-1 text-muted"></i></th>
+                                    <th class="py-3 text-end">PAYMENT (Rp)<br><span style="font-size: 10px;">(PEMBAYARAN (Rp))</span> <i class="ph-fill ph-caret-up ms-1 text-muted"></i></th>
+                                    <th class="py-3">STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                user.financeData.history.forEach((row, index) => {
+                    let indoStatus = '';
+                    if (row.status.includes("Due Date")) indoStatus = 'Belum Jatuh Tempo (Auto Debit)';
+                    else if (row.status.includes("Haven't Paid")) indoStatus = 'Belum Lunas (Auto Debit)';
+                    
+                    html += `
+                        <tr style="border-bottom: 1px solid #eaeaea;">
+                            <td class="text-muted">${index + 1}</td>
+                            <td class="text-muted">${row.period}</td>
+                            <td class="text-start">
+                                <span style="color: #444;">${row.description}</span><br>
+                                <span class="text-muted" style="font-size: 11px;">(Biaya Kuliah Semester)</span>
+                            </td>
+                            <td class="text-muted">${row.dueDate}</td>
+                            <td class="text-end text-muted">${row.billing}</td>
+                            <td class="text-end text-muted">${row.payment}</td>
+                            <td class="text-muted">
+                                ${row.status === 'Paid' ? 'Paid' : `
+                                    ${row.status.split(' (')[0]}<br>
+                                    <span style="font-size: 10px;">(${indoStatus})</span>
+                                `}
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += `</tbody></table></div>`;
+                tableContainer.innerHTML = html;
+            }
+        }
+    }
+
+    // ========================================================
+    // LOGIKA HALAMAN SCHEDULE (`schedule.html`)
+    // ========================================================
+    if (currentPage === 'schedule') {
+        const scheduleListContainer = document.getElementById('schedule-list-container');
+        const miniCalendarContainer = document.getElementById('mini-calendar-container');
+
+        if (scheduleListContainer && user.scheduleData) {
+            // Group schedule data by date
+            const groupedSchedule = {};
+            user.scheduleData.forEach(item => {
+                if (!groupedSchedule[item.date]) {
+                    groupedSchedule[item.date] = { groupStr: item.groupStr, items: [] };
+                }
+                groupedSchedule[item.date].items.push(item);
+            });
+
+            let listHTML = '';
+            for (const [date, data] of Object.entries(groupedSchedule)) {
+                const dayStr = data.groupStr.split(' ')[0];
+                const dateNum = data.groupStr.split(' ')[1];
+
+                let itemsHTML = '';
+                data.items.forEach(item => {
+                    let badgeClass = 'schedule-badge';
+                    let badgeText = '';
+                    if (item.type === 'class') { badgeText = 'Onsite Class'; }
+                    else if (item.type === 'exam') { badgeText = 'Onsite Exam'; badgeClass += ' badge-exam'; }
+                    else if (item.type === 'assignment') { badgeText = 'Assignment'; badgeClass += ' badge-exam'; }
+
+                    itemsHTML += `
+                        <div class="d-flex justify-content-between mb-4 border-bottom border-hairline pb-4" style="border-bottom-color: #eaeaea !important; ${data.items[data.items.length-1] === item ? 'border-bottom: none !important; margin-bottom: 0 !important; padding-bottom: 0 !important;' : ''}">
+                            <div class="flex-grow-1 pe-3">
+                                <h6 class="fw-bold mb-1" style="color: var(--text-primary); font-size: 15px;">${item.courseCode} <span class="fw-normal text-muted ms-1">${item.courseName}</span></h6>
+                                <p class="mb-2" style="color: var(--text-primary);">${item.session}</p>
+                                <div class="small text-muted d-flex align-items-center mb-1"><i class="ph-bold ${item.icon} me-2 fs-6"></i> ${item.details}</div>
+                                <div class="small text-muted d-flex align-items-center mb-1"><i class="ph-bold ph-clock me-2 fs-6"></i> ${item.time}</div>
+                                ${item.location ? `<div class="small text-muted d-flex align-items-center mb-1"><i class="ph-bold ph-map-pin me-2 fs-6"></i> ${item.location}</div>` : ''}
+                                ${item.seat ? `<div class="small text-muted d-flex align-items-center"><i class="ph-bold ph-armchair me-2 fs-6"></i> ${item.seat}</div>` : ''}
+                            </div>
+                            <div class="text-end">
+                                <span class="${badgeClass}">${badgeText}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                listHTML += `
+                    <div class="d-flex mb-4">
+                        <div class="me-4 text-center date-col">
+                            <div class="text-muted small">${dayStr}</div>
+                            <div class="fs-2 fw-light lh-1" style="color: var(--text-primary);">${dateNum}</div>
+                        </div>
+                        <div class="flex-grow-1 border rounded p-4 bg-white shadow-sm" style="border-color: var(--border-hairline) !important;">
+                            ${itemsHTML}
+                        </div>
+                    </div>
+                `;
+            }
+            scheduleListContainer.innerHTML = listHTML;
+        }
+
+        if (miniCalendarContainer) {
+            // Static mock calendar for June 2026 based on the provided image
+            const eventDates = [1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 22, 23, 24, 25, 26, 29, 30];
+            let calHTML = '<div class="calendar-grid">';
+            
+            // May 31 (Sun)
+            calHTML += `<div class="calendar-day text-muted">31</div>`;
+            
+            // June 1 to 30
+            for (let i = 1; i <= 30; i++) {
+                const isEvent = eventDates.includes(i);
+                const isActive = i === 18;
+                // Generate a random color for the dot from red, purple, gray, cyan
+                const dotColors = ['#dc3545', '#6f42c1', '#6c757d', '#0dcaf0'];
+                const randomColor = dotColors[Math.floor(Math.random() * dotColors.length)];
+
+                calHTML += `
+                    <div class="calendar-day ${isActive ? 'active shadow-sm' : ''}">
+                        ${i}
+                        ${isEvent ? `<div class="event-dot" ${!isActive ? `style="background-color: ${randomColor};"` : ''}></div>` : ''}
+                    </div>
+                `;
+            }
+
+            // July 1 to 4
+            for (let i = 1; i <= 4; i++) {
+                calHTML += `<div class="calendar-day text-muted">${i}</div>`;
+            }
+
+            calHTML += '</div>';
+            miniCalendarContainer.innerHTML = calHTML;
+        }
+    }
+
 });

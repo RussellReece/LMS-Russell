@@ -77,16 +77,18 @@
             <div id="navbar-container"></div>
 
             <div class="container py-4 px-md-5">
-                <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex justify-content-between align-items-end mb-4">
                     <div>
+                        <a href="task-detail.html?taskId=2" id="btn-back-to-task" class="text-decoration-none fw-semibold mb-3 d-inline-block hover-elevate" style="color: var(--color-primary);"><i class="ph ph-arrow-left me-1"></i> Kembali ke Detail Tugas</a>
+                        <br>
                         <div class="badge bg-primary mb-2">CollabSpace (Beta)</div>
                         <h3 class="fw-bold mb-0" id="collab-doc-title">Dokumen Kelompok</h3>
                     </div>
                     <div class="d-flex gap-2">
-                        <span class="badge d-flex align-items-center" style="background-color: var(--color-surface); color: var(--text-primary); border: 1px solid var(--border-hairline);">
+                        <span class="badge d-flex align-items-center" style="background-color: var(--color-surface); color: var(--text-primary); border: 1px solid var(--border-hairline); padding: 10px 16px; font-size: 14px;">
                             <i class="ph-fill ph-git-branch text-success me-2 fs-5"></i> Split View Active
                         </span>
-                        <button id="btn-merge" class="btn btn-success" style="border-radius: var(--radius-btn);"><i class="ph-bold ph-git-merge me-2"></i>Merge to Main</button>
+                        <button id="btn-merge" class="btn btn-success fw-bold" style="border-radius: var(--radius-btn); padding: 8px 20px;"><i class="ph-bold ph-git-merge me-2"></i>Merge to Main</button>
                     </div>
                 </div>
 
@@ -110,12 +112,77 @@
                         <div class="card border-0 h-100 shadow-sm" style="border-radius: var(--radius-card); border: 1px solid #ffc107 !important;">
                             <div class="card-header bg-transparent py-3 d-flex align-items-center justify-content-between" style="border-bottom: 1px solid #ffc107;">
                                 <span class="fw-bold"><i class="ph-duotone ph-git-commit me-2 text-warning"></i><span id="member-branch-name">Branch</span></span>
-                                <span class="badge bg-warning text-dark">Proposed Changes</span>
+                                <div>
+                                    <span class="badge bg-warning text-dark me-2">Proposed Changes</span>
+                                    <button class="btn btn-sm btn-outline-dark fw-bold hover-elevate" style="border-radius: var(--radius-btn);"><i class="ph-bold ph-upload-simple me-1"></i> Push to Branch</button>
+                                </div>
                             </div>
                             <div class="card-body p-0">
                                 <div id="member-branch-editor" class="block-editor">
                                     <!-- Blocks injected by JS -->
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Repository & File Versioning Section -->
+                <h5 class="fw-bold mb-3 mt-5"><i class="ph-duotone ph-folder-open me-2"></i>Repository & File Versioning</h5>
+                <div class="card border-0 p-4 mb-5 shadow-sm" style="background-color: var(--color-surface); border-radius: var(--radius-card);">
+                    <div class="row">
+                        <div class="col-md-4 border-end" style="border-color: var(--border-hairline) !important;">
+                            <h6 class="fw-bold mb-3" style="color: var(--text-primary);">Upload File Baru</h6>
+                            <p class="small text-muted mb-3">Sistem otomatis mendeteksi nama file yang sama sebagai versi baru.</p>
+                            <div class="p-4 border border-dashed rounded text-center mb-3 hover-elevate" style="border-color: var(--color-primary); background-color: rgba(var(--color-primary-rgb), 0.05); cursor: pointer;">
+                                <i class="ph-duotone ph-cloud-arrow-up fs-1 mb-2" style="color: var(--color-primary);"></i>
+                                <div class="fw-semibold small" style="color: var(--color-primary);">Pilih atau Drop File</div>
+                            </div>
+                        </div>
+                        <div class="col-md-8 ps-md-4">
+                            <h6 class="fw-bold mb-3" style="color: var(--text-primary);">Riwayat Versi (Track Changes)</h6>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0" style="font-size: 14px;">
+                                    <thead class="table-light text-muted">
+                                        <tr>
+                                            <th>Nama File</th>
+                                            <th>Versi</th>
+                                            <th>Diunggah Oleh</th>
+                                            <th>Waktu</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="border-top: none;">
+                                        <tr>
+                                            <td class="fw-semibold" style="color: var(--text-primary);"><i class="ph-fill ph-file-doc text-primary me-2 fs-5 align-middle"></i>Laporan_Sistem.docx</td>
+                                            <td><span class="badge bg-success">v2.0 (Latest)</span></td>
+                                            <td style="color: var(--text-secondary);">Budi Santoso</td>
+                                            <td class="text-muted">10 mnt lalu</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-light text-primary p-1 me-1"><i class="ph-bold ph-download-simple"></i></button>
+                                                <button class="btn btn-sm btn-light text-danger p-1"><i class="ph-bold ph-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted"><i class="ph-fill ph-file-doc text-secondary me-2 fs-5 align-middle"></i>Laporan_Sistem.docx</td>
+                                            <td><span class="badge bg-secondary">v1.0</span></td>
+                                            <td style="color: var(--text-secondary);">Andi Wijaya</td>
+                                            <td class="text-muted">Kemarin, 14:00</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-light text-primary p-1 me-1"><i class="ph-bold ph-download-simple"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-semibold" style="color: var(--text-primary);"><i class="ph-fill ph-file-xls text-success me-2 fs-5 align-middle"></i>Data_Responden.xlsx</td>
+                                            <td><span class="badge bg-success">v1.0 (Latest)</span></td>
+                                            <td style="color: var(--text-secondary);">Siti Aminah</td>
+                                            <td class="text-muted">Kemarin, 09:15</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-light text-primary p-1 me-1"><i class="ph-bold ph-download-simple"></i></button>
+                                                <button class="btn btn-sm btn-light text-danger p-1"><i class="ph-bold ph-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

@@ -15,7 +15,7 @@
             <div id="navbar-container"></div>
             <div class="container-fluid px-4 py-4">
                 
-                <div class="d-flex justify-content-between align-items-start mb-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
                         <span id="course-status-badge" class="badge mb-2 d-none" style="background-color: var(--color-surface); color: var(--color-primary); border: 1px solid var(--border-hairline);">Sesi Berlangsung</span>
                         <h2 id="course-detail-title" class="fw-bold mb-1" style="color: var(--text-primary);">Loading...</h2>
@@ -23,13 +23,56 @@
                     </div>
                 </div>
 
+                <!-- Inner Navigation Menu -->
+                <div class="border-bottom mb-4 mt-1">
+                    <ul class="nav nav-tabs border-0 flex-nowrap overflow-auto" id="course-inner-nav" role="tablist" style="gap: 2rem; font-size: 15px; scrollbar-width: none;">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link fw-semibold active px-0 pb-3 bg-transparent" id="nav-session-tab" data-bs-toggle="tab" data-bs-target="#nav-session" type="button" role="tab" aria-controls="nav-session" aria-selected="true" style="color: var(--color-primary); border: none; border-bottom: 2px solid var(--color-primary);">Session</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link text-muted px-0 pb-3 bg-transparent hover-elevate" id="nav-syllabus-tab" data-bs-toggle="tab" data-bs-target="#nav-syllabus" type="button" role="tab" aria-controls="nav-syllabus" aria-selected="false" style="border: none;">Syllabus</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link text-muted px-0 pb-3 bg-transparent hover-elevate" id="nav-people-tab" data-bs-toggle="tab" data-bs-target="#nav-people" type="button" role="tab" aria-controls="nav-people" aria-selected="false" style="border: none;">People</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link text-muted px-0 pb-3 bg-transparent hover-elevate" id="nav-attendance-tab" data-bs-toggle="tab" data-bs-target="#nav-attendance" type="button" role="tab" aria-controls="nav-attendance" aria-selected="false" style="border: none;">Attendance</a>
+                        </li>
+                    </ul>
+                </div>
+
                 <div class="row g-4">
-                    <!-- KOLOM TUNGGAL: Timeline Materi & Absensi (Lebih Bersih & Lega) -->
                     <div class="col-12 col-lg-10 mx-auto">
-                        <div class="card p-4 h-100 border-0 shadow-sm">
-                            <h5 class="fw-bold mb-4" style="color: var(--text-primary);">Materi & Aktivitas</h5>
-                            <!-- Penampung Syllabus Accordion Dinamis -->
-                            <div class="accordion syllabus-accordion" id="courseAccordion"></div>
+                        <div class="tab-content" id="nav-tabContent">
+                            <!-- Session Tab -->
+                            <div class="tab-pane fade show active" id="nav-session" role="tabpanel" aria-labelledby="nav-session-tab">
+                                <div class="card p-4 h-100 border-0 shadow-sm">
+                                    <!-- Penampung Syllabus Accordion Dinamis -->
+                                    <div class="accordion syllabus-accordion" id="courseAccordion"></div>
+                                </div>
+                            </div>
+                            <!-- Syllabus Tab -->
+                            <div class="tab-pane fade" id="nav-syllabus" role="tabpanel" aria-labelledby="nav-syllabus-tab">
+                                <div class="card p-4 h-100 border-0 shadow-sm text-center py-5">
+                                    <i class="ph-duotone ph-file-text fs-1 text-muted mb-3"></i>
+                                    <h5 class="text-muted">Dokumen Silabus Belum Tersedia</h5>
+                                    <p class="text-muted small">Silakan merujuk pada tab Session untuk melihat materi mingguan secara detail.</p>
+                                </div>
+                            </div>
+                            <!-- People Tab -->
+                            <div class="tab-pane fade" id="nav-people" role="tabpanel" aria-labelledby="nav-people-tab">
+                                <div class="card p-4 h-100 border-0 shadow-sm" id="course-people-container">
+                                    <!-- Konten teman kelas akan di-render di sini -->
+                                    <div class="text-center text-muted py-5"><div class="spinner-border spinner-border-sm text-primary"></div></div>
+                                </div>
+                            </div>
+                            <!-- Attendance Tab -->
+                            <div class="tab-pane fade" id="nav-attendance" role="tabpanel" aria-labelledby="nav-attendance-tab">
+                                <div id="course-attendance-container">
+                                    <!-- Konten attendance akan di-render di sini -->
+                                    <div class="text-center text-muted py-5"><div class="spinner-border spinner-border-sm text-primary"></div></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

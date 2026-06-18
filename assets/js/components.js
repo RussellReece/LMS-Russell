@@ -22,8 +22,10 @@ const renderSidebar = (activePage, user) => {
                     <a href="courses.html" class="list-group-item rounded mb-1 ${activePage === 'courses' ? 'active-nav' : ''}"><i class="ph ph-book-open me-2"></i>Courses</a>
                     <a href="assessment.html" class="list-group-item rounded mb-1 ${activePage === 'assessment' ? 'active-nav' : ''}"><i class="ph ph-clipboard-text me-2"></i>Assessment</a>
                     <a href="grades.html" class="list-group-item rounded mb-1 ${activePage === 'grades' ? 'active-nav' : ''}"><i class="ph ph-exam me-2"></i>Grades & Transcript</a>
+                    <a href="finance.html" class="list-group-item rounded mb-1 ${activePage === 'finance' ? 'active-nav' : ''}"><i class="ph ph-wallet me-2"></i>Finance</a>
+                    <a href="schedule.html" class="list-group-item rounded mb-1 ${activePage === 'schedule' ? 'active-nav' : ''}"><i class="ph ph-calendar-blank me-2"></i>Schedule</a>
                     <a href="#" onclick="handleBackpackNav(event)" class="list-group-item rounded mb-1 ${activePage === 'backpack' ? 'active-nav' : ''}"><i class="ph ph-backpack me-2"></i>Cloud Backpack</a>
-                    <a href="collab.html" class="list-group-item rounded mb-1 ${activePage === 'collab' ? 'active-nav' : ''}"><i class="ph ph-users-three me-2"></i>CollabSpace</a>
+                    <a href="#" onclick="handleCollabNav(event)" class="list-group-item rounded mb-1 ${activePage === 'collab' ? 'active-nav' : ''}"><i class="ph ph-users-three me-2"></i>CollabSpace</a>
                 </div>
                 <div class="mt-auto p-3 border-top border-hairline">
                     <button id="logoutBtn" class="btn w-100 text-start d-flex align-items-center" style="color: var(--text-secondary); font-size: 14px;"><i class="ph ph-sign-out me-2"></i> Logout</button>
@@ -52,6 +54,7 @@ const renderSidebar = (activePage, user) => {
                     <a href="${user.dashboardUrl}" class="list-group-item rounded mb-1 ${activePage === 'dashboard' ? 'active-nav' : ''}" style="color: var(--text-secondary); border: none; background: transparent;"><i class="ph ph-squares-four me-2"></i>Command Center</a>
                     <a href="teacher-courses.html" class="list-group-item rounded mb-1 ${activePage === 'courses' ? 'active-nav' : ''}" style="color: var(--text-secondary); border: none; background: transparent;"><i class="ph ph-chalkboard-teacher me-2"></i>Kelola Mata Kuliah</a>
                     <a href="#" class="list-group-item rounded mb-1" style="color: var(--text-secondary); border: none; background: transparent;"><i class="ph ph-users-three me-2"></i>Data Siswa</a>
+                    <a href="schedule.html" class="list-group-item rounded mb-1 ${activePage === 'schedule' ? 'active-nav' : ''}" style="color: var(--text-secondary); border: none; background: transparent;"><i class="ph ph-calendar-blank me-2"></i>Jadwal Akademik</a>
                     <a href="grading-panel.html" class="list-group-item rounded mb-1 ${activePage === 'grading-panel' ? 'active-nav' : ''}" style="color: var(--text-secondary); border: none; background: transparent;"><i class="ph ph-check-square-offset me-2"></i>Penilaian (Grading)</a>
                 </div>
 
@@ -83,8 +86,9 @@ const renderSidebar = (activePage, user) => {
                     <a href="courses.html" class="btn-kids-nav ${activePage === 'courses' ? 'active-kids' : ''}"><i class="ph-fill ph-book me-2 fs-4"></i> Pelajaran</a>
                     <a href="assessment.html" class="btn-kids-nav ${activePage === 'assessment' ? 'active-kids' : ''}"><i class="ph-fill ph-star me-2 fs-4"></i> Tugas</a>
                     <a href="grades.html" class="btn-kids-nav ${activePage === 'grades' ? 'active-kids' : ''}"><i class="ph-fill ph-medal me-2 fs-4"></i> Rapotku</a>
+                    <a href="schedule.html" class="btn-kids-nav ${activePage === 'schedule' ? 'active-kids' : ''}"><i class="ph-fill ph-calendar-blank me-2 fs-4"></i> Jadwal</a>
                     <a href="#" onclick="handleBackpackNav(event)" class="btn-kids-nav ${activePage === 'backpack' ? 'active-kids' : ''}"><i class="ph-fill ph-backpack me-2 fs-4"></i> Tas Digital</a>
-                    <a href="collab.html" class="btn-kids-nav ${activePage === 'collab' ? 'active-kids' : ''}"><i class="ph-fill ph-users-three me-2 fs-4"></i> Kerja Kelompok</a>
+                    <a href="#" onclick="handleCollabNav(event)" class="btn-kids-nav ${activePage === 'collab' ? 'active-kids' : ''}"><i class="ph-fill ph-users-three me-2 fs-4"></i> Kerja Kelompok</a>
                 </div>
                 <div class="mt-auto pt-3">
                     <button id="logoutBtn" class="btn w-100 rounded-pill py-2" style="background-color: transparent; border: 2px solid var(--border-hairline); color: var(--text-primary); font-weight: 700;"><i class="ph-bold ph-sign-out me-2"></i> Keluar</button>
@@ -102,8 +106,9 @@ const renderSidebar = (activePage, user) => {
                     <a href="courses.html" class="nav-teens ${activePage === 'courses' ? 'active' : ''}"><i class="ph-bold ph-book-open me-2"></i>My Courses</a>
                     <a href="assessment.html" class="nav-teens ${activePage === 'assessment' ? 'active' : ''}"><i class="ph-bold ph-clipboard-text me-2"></i>Assignments</a>
                     <a href="grades.html" class="nav-teens ${activePage === 'grades' ? 'active' : ''}"><i class="ph-bold ph-exam me-2"></i>Grades Report</a>
+                    <a href="schedule.html" class="nav-teens ${activePage === 'schedule' ? 'active' : ''}"><i class="ph-bold ph-calendar-blank me-2"></i>My Schedule</a>
                     <a href="#" onclick="handleBackpackNav(event)" class="nav-teens ${activePage === 'backpack' ? 'active' : ''}"><i class="ph-bold ph-backpack me-2"></i>Cloud Backpack</a>
-                    <a href="collab.html" class="nav-teens ${activePage === 'collab' ? 'active' : ''}"><i class="ph-bold ph-users-three me-2"></i>CollabSpace</a>
+                    <a href="#" onclick="handleCollabNav(event)" class="nav-teens ${activePage === 'collab' ? 'active' : ''}"><i class="ph-bold ph-users-three me-2"></i>CollabSpace</a>
                 </div>
                 <div class="mt-auto pt-4 border-top border-hairline">
                     <div class="d-flex align-items-center mb-3">

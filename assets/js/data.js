@@ -86,7 +86,181 @@ const mockUsers = [
                     ]}
                 ]}
             ]
-        }
+        },
+        courseDistribution: [
+            {
+                semester: 1,
+                courses: [
+                    { code: 'CHAR6001005', name: 'Character Building: Pancasila', credits: 2, qc: 'No', minGrade: 'C', grade: 'A', status: 'PASSED' },
+                    { code: 'ENTR6001005', name: 'Design Thinking', credits: 2, qc: 'No', minGrade: 'D', grade: 'A', status: 'PASSED' },
+                    { code: 'ISYS6001005', name: 'Pemrograman Dasar', credits: '2 / 2', qc: 'No', minGrade: 'D', grade: 'A', status: 'PASSED' },
+                    { code: 'ISYS6002005', name: 'Sistem Informasi Industri Kreatif', credits: 4, qc: 'Yes', minGrade: 'C', grade: 'B+', status: 'PASSED' },
+                    { code: 'ACCT6001005', name: 'Pengantar Akuntansi', credits: 4, qc: 'No', minGrade: 'D', grade: 'A-', status: 'PASSED' },
+                    { code: 'ISYS6004005', name: 'Proses Bisnis Fundamental', credits: 2, qc: 'No', minGrade: 'D', grade: 'A-', status: 'PASSED' }
+                ]
+            },
+            {
+                semester: 2,
+                courses: [
+                    { code: 'ISYS6003005', name: 'Analisis dan Perancangan Sistem Informasi', credits: 4, qc: 'Yes', minGrade: 'C', grade: 'A', status: 'PASSED' },
+                    { code: 'ISYS6005005', name: 'UX Research and Design', credits: 4, qc: 'No', minGrade: 'D', grade: 'A', status: 'PASSED' },
+                    { code: 'ISYS6006005', name: 'Sistem Basis Data', credits: '2 / 2', qc: 'No', minGrade: 'D', grade: 'A', status: 'PASSED' },
+                    { code: 'ISYS6007005', name: 'Manajemen Proyek Sistem Informasi', credits: 4, qc: 'Yes', minGrade: 'C', grade: 'A', status: 'PASSED' }
+                ]
+            }
+        ],
+        detailedGrades: [
+            {
+                scu: 2,
+                name: 'Character Building: Pancasila',
+                components: [
+                    { name: 'THEORY: ASSIGNMENT', weight: '20.0%', score: 'N/A' },
+                    { name: 'THEORY: MID EXAM', weight: '30.0%', score: '89' },
+                    { name: 'THEORY: FINAL EXAM', weight: '50.0%', score: 'N/A' }
+                ],
+                total: 'N/A',
+                grade: 'N/A'
+            },
+            {
+                scu: 4,
+                name: 'Analisis dan Perancangan Sistem Informasi',
+                components: [
+                    { name: 'THEORY: PROJECT', weight: '50.0%', score: 'N/A' },
+                    { name: 'THEORY: FINAL EXAM', weight: '30.0%', score: 'N/A' },
+                    { name: 'THEORY: MID EXAM', weight: '20.0%', score: '95' }
+                ],
+                total: 'N/A',
+                grade: 'N/A'
+            },
+            {
+                scu: 4,
+                name: 'Sistem Basis Data',
+                components: [
+                    { name: 'LAB: ASSIGNMENT', weight: '20.0%', score: 'N/A' },
+                    { name: 'LAB: FINAL EXAM', weight: '20.0%', score: 'N/A' },
+                    { name: 'THEORY: ASSIGNMENT', weight: '12.0%', score: 'N/A' },
+                    { name: 'THEORY: MID EXAM', weight: '18.0%', score: '94' },
+                    { name: 'THEORY: FINAL EXAM', weight: '30.0%', score: 'N/A' }
+                ],
+                total: 'N/A',
+                grade: 'N/A'
+            },
+            {
+                scu: 6,
+                name: 'UX Research and Design',
+                components: [
+                    { name: 'LAB: ASSIGNMENT', weight: '15.0%', score: 'N/A' },
+                    { name: 'LAB: FINAL EXAM', weight: '15.0%', score: 'N/A' },
+                    { name: 'THEORY: ASSIGNMENT', weight: '14.0%', score: 'N/A' },
+                    { name: 'THEORY: FINAL EXAM', weight: '35.0%', score: 'N/A' },
+                    { name: 'THEORY: MID EXAM', weight: '21.0%', score: '86' }
+                ],
+                total: 'N/A',
+                grade: 'N/A'
+            }
+        ],
+        financeData: {
+            summary: {
+                totalBilling: '30.000.000,00',
+                totalPayment: '24.000.000,00',
+                deposit: '0,00',
+                outstandingPayment: '6.000.000,00'
+            },
+            history: [
+                {
+                    period: '2026, Odd Semester',
+                    description: 'Fixed Tuition Fee',
+                    dueDate: '14 Aug 2026',
+                    billing: '3.000.000,00',
+                    payment: '0,00',
+                    status: "Haven't Due Date yet (Auto Debit)"
+                },
+                {
+                    period: '2026, Odd Semester',
+                    description: 'Fixed Tuition Fee',
+                    dueDate: '29 May 2026',
+                    billing: '3.000.000,00',
+                    payment: '0,00',
+                    status: "Haven't Paid (Auto Debit)"
+                },
+                {
+                    period: '2025, Even Semester',
+                    description: 'Fixed Tuition Fee',
+                    dueDate: '30 Jan 2026',
+                    billing: '3.000.000,00',
+                    payment: '3.000.000,00',
+                    status: 'Paid'
+                },
+                {
+                    period: '2025, Even Semester',
+                    description: 'Fixed Tuition Fee',
+                    dueDate: '29 Nov 2025',
+                    billing: '3.000.000,00',
+                    payment: '3.000.000,00',
+                    status: 'Paid'
+                },
+                {
+                    period: '2025, Odd Semester',
+                    description: 'Fixed Tuition Fee',
+                    dueDate: '26 Aug 2025',
+                    billing: '3.000.000,00',
+                    payment: '3.000.000,00',
+                    status: 'Paid'
+                },
+                {
+                    period: '2025, Odd Semester',
+                    description: 'Fixed Tuition Fee',
+                    dueDate: '26 May 2025',
+                    billing: '3.000.000,00',
+                    payment: '3.000.000,00',
+                    status: 'Paid'
+                },
+                {
+                    period: '2024, Even Semester',
+                    description: 'Fixed Tuition Fee',
+                    dueDate: '3 Feb 2025',
+                    billing: '3.000.000,00',
+                    payment: '3.000.000,00',
+                    status: 'Paid'
+                }
+            ]
+        },
+        classmates: [
+            { nim: '2702345601', name: 'Alvin Wibowo', email: 'alvin.wibowo@binus.ac.id' },
+            { nim: '2702345602', name: 'Bagas Aditya', email: 'bagas.aditya@binus.ac.id' },
+            { nim: '2702345603', name: 'Clara Bella', email: 'clara.bella@binus.ac.id' },
+            { nim: '2702345604', name: 'Daniel Pratama', email: 'daniel.pratama@binus.ac.id' },
+            { nim: '2702345605', name: 'Erika Larasati', email: 'erika.larasati@binus.ac.id' },
+            { nim: '2702345606', name: 'Fahri Muhammad', email: 'fahri.muhammad@binus.ac.id' },
+            { nim: '2702345607', name: 'Gita Saraswati', email: 'gita.saraswati@binus.ac.id' },
+            { nim: '2702345608', name: 'Hendra Saputra', email: 'hendra.saputra@binus.ac.id' }
+        ],
+        attendanceData: {
+            summary: { totalSession: 13, totalAttendance: 12, minimalAttendance: 11 },
+            history: [
+                { session: 'Session 1', delivery: 'Onsite - F2F', startDate: '12 Feb 2026, 15:20 GMT+7', endDate: '12 Feb 2026, 17:00 GMT+7', status: 'present', req: 'Classroom Check-In' },
+                { session: 'Session 2', delivery: 'Onsite - F2F', startDate: '19 Feb 2026, 15:20 GMT+7', endDate: '19 Feb 2026, 17:00 GMT+7', status: 'present', req: 'Classroom Check-In' },
+                { session: 'Session 3', delivery: 'Onsite - F2F', startDate: '26 Feb 2026, 15:20 GMT+7', endDate: '26 Feb 2026, 17:00 GMT+7', status: 'absent', req: 'Classroom Check-In' },
+                { session: 'Session 4', delivery: 'Onsite - F2F', startDate: '05 Mar 2026, 15:20 GMT+7', endDate: '05 Mar 2026, 17:00 GMT+7', status: 'present', req: 'Classroom Check-In' },
+                { session: 'Session 5', delivery: 'Onsite - F2F', startDate: '12 Mar 2026, 15:20 GMT+7', endDate: '12 Mar 2026, 17:00 GMT+7', status: 'present', req: 'Classroom Check-In' },
+                { session: 'Session 6', delivery: 'Onsite - F2F', startDate: '26 Mar 2026, 15:20 GMT+7', endDate: '26 Mar 2026, 17:00 GMT+7', status: 'present', req: 'Classroom Check-In' },
+                { session: 'Session 7', delivery: 'Onsite - F2F', startDate: '02 Apr 2026, 15:20 GMT+7', endDate: '02 Apr 2026, 17:00 GMT+7', status: 'present', req: 'Classroom Check-In' },
+                { session: 'Session 8', delivery: 'Onsite - F2F', startDate: '06 May 2026, 15:20 GMT+7', endDate: '06 May 2026, 17:00 GMT+7', status: 'present', req: 'Classroom Check-In' },
+                { session: 'Session 9', delivery: 'Onsite - F2F', startDate: '07 May 2026, 15:20 GMT+7', endDate: '07 May 2026, 17:00 GMT+7', status: 'present', req: 'Classroom Check-In' },
+                { session: 'Session 10', delivery: 'Onsite - F2F', startDate: '21 May 2026, 15:20 GMT+7', endDate: '21 May 2026, 17:00 GMT+7', status: 'present', req: 'Classroom Check-In' },
+                { session: 'Session 11', delivery: 'Onsite - F2F', startDate: '04 Jun 2026, 15:20 GMT+7', endDate: '04 Jun 2026, 17:00 GMT+7', status: 'present', req: 'Classroom Check-In' },
+                { session: 'Session 12', delivery: 'Onsite - F2F', startDate: '11 Jun 2026, 15:20 GMT+7', endDate: '11 Jun 2026, 17:00 GMT+7', status: 'present', req: 'Classroom Check-In' },
+                { session: 'Session 13', delivery: 'Onsite - F2F', startDate: '18 Jun 2026, 15:20 GMT+7', endDate: '18 Jun 2026, 17:00 GMT+7', status: 'present', req: 'Classroom Check-In' }
+            ]
+        },
+        scheduleData: [
+            { id: 1, date: '2026-06-18', groupStr: 'Thu 18', type: 'class', courseCode: 'BA05 - LAB', courseName: 'Pemrograman Front-End Web', icon: 'ph-users', details: 'F2F', session: 'Session 13', time: '13:20 - 15:00 GMT+7', location: 'Kampus Utama Universitas Satu - B302' },
+            { id: 2, date: '2026-06-18', groupStr: 'Thu 18', type: 'class', courseCode: 'BA05 - LAB', courseName: 'Office Automation Industri Kreatif', icon: 'ph-users', details: 'F2F', session: 'Session 13', time: '15:20 - 17:00 GMT+7', location: 'Kampus Utama Universitas Satu - B204' },
+            { id: 3, date: '2026-06-22', groupStr: 'Mon 22', type: 'exam', courseCode: 'LA03 - LEC', courseName: 'Character Building: Kewarganegaraan', icon: 'ph-exam', details: 'FIN', session: 'THEORY: FINAL EXAM', time: '10:00 - 11:40 GMT+7', location: '1BNDUNG - B201', seat: 'Seat 9' },
+            { id: 4, date: '2026-06-23', groupStr: 'Tue 23', type: 'exam', courseCode: 'LA05 - LEC', courseName: 'Social Media Marketing & Analytics', icon: 'ph-exam', details: 'FIN', session: 'THEORY: FINAL EXAM', time: '15:00 - 16:40 GMT+7', location: '1BNDUNG - B103', seat: 'Seat 2' },
+            { id: 5, date: '2026-06-24', groupStr: 'Wed 24', type: 'exam', courseCode: 'LA05 - LEC', courseName: 'Data and Information Management', icon: 'ph-exam', details: 'FIN', session: 'THEORY: FINAL EXAM', time: '13:00 - 14:40 GMT+7', location: '1BNDUNG - B201', seat: 'Seat 6' },
+            { id: 6, date: '2026-06-24', groupStr: 'Wed 24', type: 'assignment', courseCode: 'LA03 - LEC', courseName: 'Character Building: Kewarganegaraan', icon: 'ph-clipboard-text', details: 'Assignment Details:', session: 'Portal Pengumpulan Tugas Artikel', time: 'Due Date: 24 Juni 2026, 23:59 GMT+7', location: '' }
+        ]
     },
     {
         username: 'ari_okta', password: 'password123', name: 'Ari Okta Pratama', level: 'SMA', theme: 'teens', dashboardUrl: 'teens-dashboard.html',

@@ -96,10 +96,10 @@
                                     <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Microsoft_Office_OneDrive_%282019%E2%80%93present%29.svg" alt="OneDrive" width="24" class="me-3">
                                     <div>
                                         <div class="fw-bold" style="font-size: 14px;">Microsoft 365</div>
-                                        <div class="small text-muted">Belum terhubung</div>
+                                        <div id="onedrive-status" class="small text-muted">Belum terhubung</div>
                                     </div>
                                 </div>
-                                <button class="btn btn-sm btn-outline-secondary" disabled style="border-radius: var(--radius-btn);">Tautkan</button>
+                                <button id="btn-connect-onedrive" class="btn btn-sm btn-outline-primary" style="border-radius: var(--radius-btn);">Tautkan</button>
                             </div>
                         </div>
                     </div>
@@ -109,7 +109,10 @@
                         <div class="card border-0 p-4 h-100" style="background-color: var(--color-surface); border-radius: var(--radius-card);">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h6 class="fw-bold mb-0">Struktur Tas Digital</h6>
-                                <button id="btn-sim-enroll" class="btn btn-sm btn-primary d-none" style="border-radius: var(--radius-btn);"><i class="ph-bold ph-plus"></i> Enroll Matkul Baru</button>
+                                <div class="d-flex align-items-center gap-2">
+                                    <a id="btn-open-cloud" href="https://drive.google.com/drive/my-drive" target="_blank" class="btn btn-sm btn-outline-primary d-none" style="border-radius: var(--radius-btn);"><i class="ph-bold ph-arrow-square-out me-1"></i> Buka di Google Drive</a>
+                                    <button id="btn-sim-enroll" class="btn btn-sm btn-primary d-none" style="border-radius: var(--radius-btn);"><i class="ph-bold ph-plus"></i> Enroll Matkul Baru</button>
+                                </div>
                             </div>
 
                             <div id="backpack-tree-container" class="p-3 rounded" style="background-color: var(--bg-canvas); min-height: 200px; overflow-x: auto;">

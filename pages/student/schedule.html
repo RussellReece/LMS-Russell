@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule - LMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <style>
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            gap: 5px;
+        }
+        .calendar-header {
+            font-weight: bold;
+            font-size: 12px;
+            color: var(--text-primary);
+            padding-bottom: 10px;
+        }
+        .calendar-day {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin: 0 auto;
+            font-size: 13px;
+            cursor: pointer;
+            position: relative;
+        }
+        .calendar-day.text-muted {
+            opacity: 0.5;
+        }
+        .calendar-day.active {
+            background-color: var(--color-primary);
+            color: white !important;
+        }
+        .calendar-day .event-dot {
+            position: absolute;
+            bottom: 2px;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: var(--color-primary);
+        }
+        .calendar-day.active .event-dot {
+            background-color: white;
+        }
+        .schedule-badge {
+            border: 1px solid var(--text-secondary);
+            color: var(--text-secondary);
+            background: transparent;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .schedule-badge.badge-exam {
+            color: var(--color-danger);
+            border-color: var(--color-danger);
+        }
+        .date-col {
+            min-width: 60px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar Container -->
+        <div id="sidebar-container"></div>
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper" class="w-100 flex-grow-1 d-flex flex-column" style="background-color: var(--bg-canvas);">
+            
+            <!-- Header Container -->
+            <div id="navbar-container"></div>
+
+            <div class="container-fluid px-4 py-4">
+                
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-normal mb-0" style="color: var(--text-primary);">My Schedule</h3>
+                    <div class="d-flex gap-3 align-items-center small">
+                        <a href="#" class="text-decoration-none fw-semibold" style="color: var(--color-primary);">View Academic Calendar</a>
+                        <span class="text-muted">•</span>
+                        <a href="#" class="text-decoration-none fw-semibold" style="color: var(--color-primary);"><i class="ph-bold ph-google-logo me-1"></i>Sync Google Calendar</a>
+                        <span class="text-muted">•</span>
+                        <a href="#" class="text-decoration-none fw-semibold" style="color: var(--color-primary);"><i class="ph-bold ph-microsoft-outlook me-1"></i>Unsync Outlook</a>
+                    </div>
+                </div>
+
+                <!-- Kontrol Atas -->
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-hairline">
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="btn text-white px-3 py-1 fw-semibold" style="background-color: #a3a3a3; border-radius: var(--radius-btn);">TODAY</button>
+                        <div class="d-flex gap-1">
+                            <button class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background-color: #a3a3a3; color: white;"><i class="ph-bold ph-caret-left"></i></button>
+                            <button class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background-color: #a3a3a3; color: white;"><i class="ph-bold ph-caret-right"></i></button>
+                        </div>
+                        <h4 class="mb-0 fw-normal" style="color: var(--text-primary);">June 2026 <i class="ph-bold ph-caret-down fs-6 text-muted"></i></h4>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background-color: #a3a3a3; color: white;"><i class="ph-bold ph-faders"></i></button>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Kiri: Daftar Jadwal -->
+                    <div class="col-lg-8">
+                        <div id="schedule-list-container">
+                            <!-- Daftar jadwal akan di-render di sini -->
+                            <div class="text-center text-muted py-5"><div class="spinner-border spinner-border-sm text-primary"></div> Memuat jadwal...</div>
+                        </div>
+                    </div>
+
+                    <!-- Kanan: Mini Calendar -->
+                    <div class="col-lg-4">
+                        <div class="card border-0 shadow-sm p-4" style="border-radius: var(--radius-card); background-color: var(--color-surface);">
+                            <div class="calendar-grid mb-2">
+                                <div class="calendar-header">S</div>
+                                <div class="calendar-header">M</div>
+                                <div class="calendar-header">T</div>
+                                <div class="calendar-header">W</div>
+                                <div class="calendar-header">T</div>
+                                <div class="calendar-header">F</div>
+                                <div class="calendar-header">S</div>
+                            </div>
+                            <div id="mini-calendar-container">
+                                <!-- Kalender akan di-render di sini -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom Scripts -->
+    <script src="../../assets/js/components.js"></script>
+    <script src="../../assets/js/data.js"></script>
+    <script src="../../assets/js/app.js"></script>
+</body>
+</html>
