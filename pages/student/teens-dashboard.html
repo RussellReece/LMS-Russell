@@ -28,29 +28,36 @@
                         week. Keep up the good work!</p>
                 </div>
 
-                <div class="dashboard-grid">
-                    <div class="card grid-item-progress">
-                        <div class="card-header border-0 pt-4 pb-0 bg-transparent">
-                            <h5 class="fw-bold" style="color: var(--text-primary);">Progress Belajar</h5>
+                <div class="row g-4">
+                    <!-- Jadwal Hari Ini (Kiri) -->
+                    <div class="col-lg-7">
+                        <div class="card grid-item-class" style="border-radius: var(--radius-card); border-color: var(--border-hairline); background-color: var(--color-surface);">
+                            <div class="card-header border-0 pt-4 pb-0 bg-transparent">
+                                <h5 class="fw-bold" style="color: var(--text-primary);"><i class="ph-duotone ph-calendar-check me-2 text-primary"></i>Jadwal Hari Ini</h5>
+                            </div>
+                            <div class="card-body" id="schedule-container">
+                            </div>
                         </div>
-                        <div class="card-body" id="progress-container">
+
+                        <!-- Progress Belajar (Bawah Jadwal) -->
+                        <div class="card grid-item-progress mt-4" style="border-radius: var(--radius-card); border-color: var(--border-hairline); background-color: var(--color-surface);">
+                            <div class="card-header border-0 pt-4 pb-0 bg-transparent">
+                                <h5 class="fw-bold" style="color: var(--text-primary);"><i class="ph-duotone ph-chart-line-up me-2 text-success"></i>Progress Belajar</h5>
+                            </div>
+                            <div class="card-body" id="progress-container">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="card grid-item-class">
-                        <div class="card-header border-0 pt-4 pb-0 bg-transparent">
-                            <h5 class="fw-bold" style="color: var(--text-primary);">Jadwal Hari Ini</h5>
-                        </div>
-                        <div class="card-body" id="schedule-container">
-                        </div>
-                    </div>
-
-                    <div class="card grid-item-tasks">
-                        <div class="card-header border-0 pt-4 pb-0 bg-transparent">
-                            <h5 class="fw-bold" style="color: var(--text-primary);">Tugas Belum Selesai</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="list-group list-group-flush" id="uncompleted-tasks-container">
+                    <!-- Tugas Belum Selesai (Kanan) -->
+                    <div class="col-lg-5">
+                        <div class="card h-100 grid-item-tasks" style="border-radius: var(--radius-card); border-color: var(--border-hairline); background-color: var(--color-surface);">
+                            <div class="card-header border-0 pt-4 pb-0 bg-transparent">
+                                <h5 class="fw-bold" style="color: var(--text-primary);"><i class="ph-duotone ph-clipboard-text me-2 text-warning"></i>Tugas Belum Selesai</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="list-group list-group-flush" id="uncompleted-tasks-container">
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -133,8 +133,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (window.location.pathname.includes('backpack')) currentPage = 'backpack';
     if (window.location.pathname.includes('collab')) currentPage = 'collab';
     if (window.location.pathname.includes('assessment')) currentPage = 'assessment';
+    if (window.location.pathname.includes('schedule')) currentPage = 'schedule';
 
-    const pageTitle = currentPage === 'courses' ? 'My Courses' : currentPage === 'assessment' ? 'Assignments' : currentPage === 'course-detail' ? 'Course Detail' : currentPage === 'task-detail' ? 'Task Detail' : currentPage === 'grades' ? 'Grades Report' : currentPage === 'grading-panel' ? 'Grading Panel' : currentPage === 'backpack' ? 'Cloud Backpack' : currentPage === 'collab' ? 'CollabSpace' : 'Dashboard';
+    const pageTitle = currentPage === 'courses' ? 'My Courses' : currentPage === 'assessment' ? 'Assignments' : currentPage === 'course-detail' ? 'Course Detail' : currentPage === 'task-detail' ? 'Task Detail' : currentPage === 'grades' ? 'Grades Report' : currentPage === 'grading-panel' ? 'Grading Panel' : currentPage === 'backpack' ? 'Cloud Backpack' : currentPage === 'collab' ? 'CollabSpace' : currentPage === 'schedule' ? 'My Schedule' : 'Dashboard';
 
     // Render Navigasi Struktural Global
     const sidebarContainer = document.getElementById('sidebar-container');
@@ -1435,7 +1436,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     
                     return `
-                        <tr style="border-bottom: 1px solid var(--border-hairline);">
+                        <tr class="bg-transparent" style="border-bottom: 1px solid var(--border-hairline); background-color: transparent !important;">
                             <td class="text-center align-middle" style="color: var(--text-secondary);">${index + 1}</td>
                             <td class="align-middle">
                                 <div class="d-flex align-items-center">
@@ -1457,8 +1458,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 }).join('');
 
                 tableContainer.innerHTML = `
-                    <table class="table table-borderless table-hover mb-0" style="color: var(--text-primary);">
-                        <thead style="background-color: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border-hairline);">
+                    <table class="table table-borderless table-hover mb-0 table-dark" style="background-color: transparent; --bs-table-bg: transparent;">
+                        <thead style="background-color: rgba(255,255,255,0.05); border-bottom: 1px solid var(--border-hairline);">
                             <tr>
                                 <th class="text-center text-muted fw-semibold small py-3" width="5%">NO</th>
                                 <th class="text-muted fw-semibold small py-3" width="35%">NAMA SISWA</th>
@@ -1467,7 +1468,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <th class="text-center text-muted fw-semibold small py-3" width="20%">AKSI</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style="background-color: transparent;">
                             ${tableRows}
                         </tbody>
                     </table>
